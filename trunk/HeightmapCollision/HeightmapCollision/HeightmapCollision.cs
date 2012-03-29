@@ -20,6 +20,8 @@ namespace HeightmapCollision
     /// <summary>
     /// Sample showing how to use get the height of a programmatically generated
     /// heightmap.
+    /// 
+    /// this is steve testing commit permission.
     /// </summary>
     public class HeightmapCollisionGame : Microsoft.Xna.Framework.Game
     {
