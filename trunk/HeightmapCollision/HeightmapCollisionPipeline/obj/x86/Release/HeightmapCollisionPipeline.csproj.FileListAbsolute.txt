@@ -1,0 +1,10 @@
+C:\Users\bryan\Downloads\HeightmapCollisionSample_4_0\HeightmapCollision\HeightmapCollisionPipeline\bin\x86\Release\HeightmapCollisionPipeline.dll
+C:\Users\bryan\Downloads\HeightmapCollisionSample_4_0\HeightmapCollision\HeightmapCollisionPipeline\bin\x86\Release\HeightmapCollisionPipeline.pdb
+C:\Users\bryan\Downloads\HeightmapCollisionSample_4_0\HeightmapCollision\HeightmapCollisionPipeline\obj\x86\Release\HeightmapCollisionPipeline.csprojResolveAssemblyReference.cache
+C:\Users\bryan\Downloads\HeightmapCollisionSample_4_0\HeightmapCollision\HeightmapCollisionPipeline\obj\x86\Release\HeightmapCollisionPipeline.dll
+C:\Users\bryan\Downloads\HeightmapCollisionSample_4_0\HeightmapCollision\HeightmapCollisionPipeline\obj\x86\Release\HeightmapCollisionPipeline.pdb
+C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollisionPipeline\bin\x86\Release\HeightmapCollisionPipeline.dll
+C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollisionPipeline\bin\x86\Release\HeightmapCollisionPipeline.pdb
+C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollisionPipeline\obj\x86\Release\HeightmapCollisionPipeline.csprojResolveAssemblyReference.cache
+C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollisionPipeline\obj\x86\Release\HeightmapCollisionPipeline.dll
+C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollisionPipeline\obj\x86\Release\HeightmapCollisionPipeline.pdb

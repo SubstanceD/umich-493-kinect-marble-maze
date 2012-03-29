@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent xmlns:Pipeline="Microsoft.Xna.Framework.Content.Pipeline" xmlns:Framework="Microsoft.Xna.Framework" xmlns:Processors="Microsoft.Xna.Framework.Content.Pipeline.Processors">
+  <Asset Type="Pipeline:BuildItemCollection">
+    <Item>
+      <Source>terrain.bmp</Source>
+      <Name>terrain</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TerrainProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\terrain.xnb</Output>
+      <Time>2012-03-28T21:50:42.1029897-04:00</Time>
+      <Request>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\rocks_0.xnb</Request>
+    </Item>
+    <Item>
+      <Source>sphere.fbx</Source>
+      <Name>sphere</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\sphere.xnb</Output>
+      <Time>2010-09-20T13:52:56-04:00</Time>
+      <Dependency>
+        <Key>obj\x86\Release\sphere_0.xml</Key>
+        <Value>2012-03-28T21:46:11.3695046-04:00</Value>
+      </Dependency>
+      <Request>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\pawball_0.xnb</Request>
+    </Item>
+    <Item>
+      <Source>rocks.bmp</Source>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Parameters>
+        <Data Key="ColorKeyColor" Type="Framework:Color">FFFF00FF</Data>
+        <Data Key="ColorKeyEnabled" Type="bool">true</Data>
+        <Data Key="TextureFormat" Type="Processors:TextureProcessorOutputFormat">DxtCompressed</Data>
+        <Data Key="GenerateMipmaps" Type="bool">true</Data>
+        <Data Key="ResizeToPowerOfTwo" Type="bool">false</Data>
+        <Data Key="PremultiplyAlpha" Type="bool">true</Data>
+      </Parameters>
+      <Options>None</Options>
+      <Output>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\rocks_0.xnb</Output>
+      <Time>2010-09-20T13:52:56-04:00</Time>
+    </Item>
+    <Item>
+      <Source>sphere.fbx</Source>
+      <Importer>FbxImporter</Importer>
+      <Options>IntermediateFile, DontCacheImportedData</Options>
+      <Output>obj\x86\Release\sphere_0.xml</Output>
+      <Time>2010-09-20T13:52:56-04:00</Time>
+    </Item>
+    <Item>
+      <Source>pawball.tga</Source>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Parameters>
+        <Data Key="ColorKeyColor" Type="Framework:Color">FFFF00FF</Data>
+        <Data Key="ColorKeyEnabled" Type="bool">true</Data>
+        <Data Key="TextureFormat" Type="Processors:TextureProcessorOutputFormat">DxtCompressed</Data>
+        <Data Key="GenerateMipmaps" Type="bool">true</Data>
+        <Data Key="ResizeToPowerOfTwo" Type="bool">false</Data>
+        <Data Key="PremultiplyAlpha" Type="bool">true</Data>
+      </Parameters>
+      <Options>None</Options>
+      <Output>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\pawball_0.xnb</Output>
+      <Time>2010-09-20T13:52:56-04:00</Time>
+    </Item>
+    <BuildSuccessful>true</BuildSuccessful>
+    <Settings>
+      <TargetPlatform>Windows</TargetPlatform>
+      <TargetProfile>HiDef</TargetProfile>
+      <BuildConfiguration>Release</BuildConfiguration>
+      <CompressContent>true</CompressContent>
+      <RootDirectory>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\Content\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\Content\obj\x86\Release\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\</OutputDirectory>
+    </Settings>
+    <Assemblies>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.XImporter.dll</Key>
+        <Value>2010-08-23T13:41:18-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.VideoImporters.dll</Key>
+        <Value>2010-08-23T13:41:18-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.TextureImporter.dll</Key>
+        <Value>2010-08-23T13:41:18-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.FBXImporter.dll</Key>
+        <Value>2010-08-23T13:41:18-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.EffectImporter.dll</Key>
+        <Value>2010-08-23T13:41:18-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Program Files (x86)\Microsoft XNA\XNA Game Studio\v4.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.AudioImporters.dll</Key>
+        <Value>2010-08-23T13:41:18-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollisionPipeline\bin\x86\Release\HeightmapCollisionPipeline.dll</Key>
+        <Value>2012-03-28T01:27:11.6393316-04:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\Windows\Microsoft.Net\assembly\GAC_32\Microsoft.Xna.Framework.Content.Pipeline\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Content.Pipeline.dll</Key>
+        <Value>2011-11-09T14:20:12.6529226-05:00</Value>
+      </Assembly>
+    </Assemblies>
+  </Asset>
+</XnaContent>

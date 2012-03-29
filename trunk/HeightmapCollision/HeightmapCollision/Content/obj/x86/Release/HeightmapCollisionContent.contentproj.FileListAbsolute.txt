@@ -1,0 +1,2 @@
+C:\Users\bryan\Downloads\HeightmapCollisionSample_4_0\HeightmapCollision\HeightmapCollision\Content\obj\x86\Release\HeightmapCollisionContent.contentprojResolveAssemblyReference.cache
+C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\Content\obj\x86\Release\HeightmapCollisionContent.contentprojResolveAssemblyReference.cache
