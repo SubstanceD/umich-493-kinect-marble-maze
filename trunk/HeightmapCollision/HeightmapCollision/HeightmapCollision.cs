@@ -319,13 +319,71 @@ namespace HeightmapCollision
                 heightMapInfo.GetHeightAndNormal(spherePosition, out oldHeight, out oldNormal);
                 heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
 
-                if (oldHeight < newHeight)
+                if (oldHeight < newHeight) //Need to add normal calculation if we use ramps
                 {
                     newSpherePosition = spherePosition;
                 }
                 else
                 {
-                    newSpherePosition.Y = newHeight + SphereRadius;
+                    Vector3 result;
+                    result.Y = newHeight + SphereRadius;
+                    Vector3 checkForWalls = newSpherePosition;
+                    float i = 0;
+
+                    while (i < SphereRadius)
+                    {
+                        checkForWalls.X += i;
+                        if (heightMapInfo.IsOnHeightmap(checkForWalls))
+                        {
+                            heightMapInfo.GetHeightAndNormal(checkForWalls, out newHeight, out newNormal);
+                            if (newHeight != oldHeight)
+                            {
+                                break;
+                            }
+                        }
+                        else 
+                        {
+                            break;
+                        }
+                        i++;
+                    }
+                    result.X = SphereRadius - i;
+                    i = 0;
+                    while (i < SphereRadius)
+                    {
+                        checkForWalls.Z += i;
+                        if (heightMapInfo.IsOnHeightmap(checkForWalls))
+                        {
+                            heightMapInfo.GetHeightAndNormal(checkForWalls, out newHeight, out newNormal);
+                            if (newHeight != oldHeight)
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                        i++;
+                    }
+                    result.Z = SphereRadius - i;
+                    newSpherePosition.Y = result.Y;
+                    if (velocity.X > 0)
+                    {
+                        newSpherePosition.X -= result.X;
+                    }
+                    else if (velocity.X < 0)
+                    {
+                        newSpherePosition.X += result.X;
+                    }
+                    if (velocity.Z > 0)
+                    {
+                        newSpherePosition.Z -= result.Z;
+                    }
+                    else if (velocity.Z < 0)
+                    {
+                        newSpherePosition.Z += result.Z;
+                    }
                 }
 
                 
