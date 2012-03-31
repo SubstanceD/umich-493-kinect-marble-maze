@@ -20,8 +20,6 @@ namespace HeightmapCollision
     /// <summary>
     /// Sample showing how to use get the height of a programmatically generated
     /// heightmap.
-    /// 
-    /// this is steve testing commit permission.
     /// </summary>
     public class HeightmapCollisionGame : Microsoft.Xna.Framework.Game
     {
@@ -66,6 +64,8 @@ namespace HeightmapCollision
         Model sphere;
         HeightMapInfo heightMapInfo;
 
+        InputHandler input;
+
 
         #endregion
 
@@ -75,6 +75,7 @@ namespace HeightmapCollision
         public HeightmapCollisionGame()
         {
             graphics = new GraphicsDeviceManager(this);
+            input = new InputHandler(graphics);
             Content.RootDirectory = "Content";
         }
 
@@ -240,12 +241,12 @@ namespace HeightmapCollision
         /// </summary>
         private void HandleInput()
         {
+            input.update();
             KeyboardState currentKeyboardState = Keyboard.GetState();
             GamePadState currentGamePadState = GamePad.GetState(PlayerIndex.One);
 
             // Check for exit.
-            if (currentKeyboardState.IsKeyDown(Keys.Escape) ||
-                currentGamePadState.Buttons.Back == ButtonState.Pressed)
+            if (input.exit())
             {
                 Exit();
             }
