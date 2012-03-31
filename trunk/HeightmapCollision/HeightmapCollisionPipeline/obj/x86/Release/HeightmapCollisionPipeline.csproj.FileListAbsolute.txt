@@ -8,3 +8,8 @@ C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCol
 C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollisionPipeline\obj\x86\Release\HeightmapCollisionPipeline.csprojResolveAssemblyReference.cache
 C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollisionPipeline\obj\x86\Release\HeightmapCollisionPipeline.dll
 C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollisionPipeline\obj\x86\Release\HeightmapCollisionPipeline.pdb
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollisionPipeline\bin\x86\Release\HeightmapCollisionPipeline.dll
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollisionPipeline\bin\x86\Release\HeightmapCollisionPipeline.pdb
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollisionPipeline\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollisionPipeline\obj\x86\Release\HeightmapCollisionPipeline.dll
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollisionPipeline\obj\x86\Release\HeightmapCollisionPipeline.pdb

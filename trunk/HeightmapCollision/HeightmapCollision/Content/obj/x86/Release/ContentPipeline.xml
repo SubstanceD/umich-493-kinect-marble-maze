@@ -7,9 +7,9 @@
       <Importer>TextureImporter</Importer>
       <Processor>TerrainProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\terrain.xnb</Output>
-      <Time>2012-03-28T21:50:42.1029897-04:00</Time>
-      <Request>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\rocks_0.xnb</Request>
+      <Output>C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\terrain.xnb</Output>
+      <Time>2012-03-29T14:55:35.966-04:00</Time>
+      <Request>C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\rocks_0.xnb</Request>
     </Item>
     <Item>
       <Source>sphere.fbx</Source>
@@ -17,13 +17,13 @@
       <Importer>FbxImporter</Importer>
       <Processor>ModelProcessor</Processor>
       <Options>None</Options>
-      <Output>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\sphere.xnb</Output>
-      <Time>2010-09-20T13:52:56-04:00</Time>
+      <Output>C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\sphere.xnb</Output>
+      <Time>2012-03-29T14:55:35.987-04:00</Time>
       <Dependency>
         <Key>obj\x86\Release\sphere_0.xml</Key>
-        <Value>2012-03-28T21:46:11.3695046-04:00</Value>
+        <Value>2012-03-29T14:56:23.668-04:00</Value>
       </Dependency>
-      <Request>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\pawball_0.xnb</Request>
+      <Request>C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\pawball_0.xnb</Request>
     </Item>
     <Item>
       <Source>rocks.bmp</Source>
@@ -38,15 +38,15 @@
         <Data Key="PremultiplyAlpha" Type="bool">true</Data>
       </Parameters>
       <Options>None</Options>
-      <Output>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\rocks_0.xnb</Output>
-      <Time>2010-09-20T13:52:56-04:00</Time>
+      <Output>C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\rocks_0.xnb</Output>
+      <Time>2012-03-29T14:55:38.23-04:00</Time>
     </Item>
     <Item>
       <Source>sphere.fbx</Source>
       <Importer>FbxImporter</Importer>
       <Options>IntermediateFile, DontCacheImportedData</Options>
       <Output>obj\x86\Release\sphere_0.xml</Output>
-      <Time>2010-09-20T13:52:56-04:00</Time>
+      <Time>2012-03-29T14:55:35.987-04:00</Time>
     </Item>
     <Item>
       <Source>pawball.tga</Source>
@@ -61,8 +61,8 @@
         <Data Key="PremultiplyAlpha" Type="bool">true</Data>
       </Parameters>
       <Options>None</Options>
-      <Output>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\pawball_0.xnb</Output>
-      <Time>2010-09-20T13:52:56-04:00</Time>
+      <Output>C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\pawball_0.xnb</Output>
+      <Time>2012-03-29T14:55:38.199-04:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
@@ -70,10 +70,10 @@
       <TargetProfile>HiDef</TargetProfile>
       <BuildConfiguration>Release</BuildConfiguration>
       <CompressContent>true</CompressContent>
-      <RootDirectory>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\Content\</RootDirectory>
-      <LoggerRootDirectory>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\</LoggerRootDirectory>
-      <IntermediateDirectory>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\Content\obj\x86\Release\</IntermediateDirectory>
-      <OutputDirectory>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\</OutputDirectory>
+      <RootDirectory>C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\Content\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\Content\obj\x86\Release\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\</OutputDirectory>
     </Settings>
     <Assemblies>
       <Assembly>
@@ -101,12 +101,12 @@
         <Value>2010-08-23T13:41:18-04:00</Value>
       </Assembly>
       <Assembly>
-        <Key>C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollisionPipeline\bin\x86\Release\HeightmapCollisionPipeline.dll</Key>
-        <Value>2012-03-28T01:27:11.6393316-04:00</Value>
+        <Key>C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollisionPipeline\bin\x86\Release\HeightmapCollisionPipeline.dll</Key>
+        <Value>2012-03-29T14:56:15.437-04:00</Value>
       </Assembly>
       <Assembly>
         <Key>C:\Windows\Microsoft.Net\assembly\GAC_32\Microsoft.Xna.Framework.Content.Pipeline\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Content.Pipeline.dll</Key>
-        <Value>2011-11-09T14:20:12.6529226-05:00</Value>
+        <Value>2012-01-22T15:36:10.2164-05:00</Value>
       </Assembly>
     </Assemblies>
   </Asset>
