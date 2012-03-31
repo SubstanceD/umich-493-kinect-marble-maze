@@ -18,3 +18,13 @@ C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCol
 C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\obj\x86\Release\Microsoft.Xna.Framework.RuntimeProfile.txt
 C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\obj\x86\Release\HeightmapCollision.exe
 C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\obj\x86\Release\HeightmapCollision.pdb
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\terrain.xnb
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\sphere.xnb
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\rocks_0.xnb
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\Content\pawball_0.xnb
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\HeightmapCollision.exe
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\bin\x86\Release\HeightmapCollision.pdb
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\obj\x86\Release\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\obj\x86\Release\HeightmapCollision.exe
+C:\Users\Steve\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\obj\x86\Release\HeightmapCollision.pdb
