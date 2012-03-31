@@ -254,24 +254,8 @@ namespace HeightmapCollision
             // Now move the sphere. First, we want to check to see if the sphere should
             // turn. turnAmount will be an accumulation of all the different possible
             // inputs.
-            float turnAmount = -currentGamePadState.ThumbSticks.Left.X;
-            if (currentKeyboardState.IsKeyDown(Keys.A) ||
-                currentKeyboardState.IsKeyDown(Keys.Left) ||
-                currentGamePadState.DPad.Left == ButtonState.Pressed)
-            {
-                turnAmount += 1;
-            }
-            if (currentKeyboardState.IsKeyDown(Keys.D) ||
-                currentKeyboardState.IsKeyDown(Keys.Right) ||
-                currentGamePadState.DPad.Right == ButtonState.Pressed)
-            {
-                turnAmount -= 1;
-            }
 
-            // clamp the turn amount between -1 and 1, and then use the finished
-            // value to turn the sphere.
-            turnAmount = MathHelper.Clamp(turnAmount, -1, 1);
-            sphereFacingDirection += turnAmount * SphereTurnSpeed;
+            sphereFacingDirection += input.turnAmount() *SphereTurnSpeed;
 
 
             // Next, we want to move the sphere forward or back. to do this, 
@@ -323,7 +307,7 @@ namespace HeightmapCollision
                 {
                     newSpherePosition = spherePosition;
                 }
-                else
+                else //newHeight <= oldHeight
                 {
                     Vector3 result;
                     result.Y = newHeight + SphereRadius;
