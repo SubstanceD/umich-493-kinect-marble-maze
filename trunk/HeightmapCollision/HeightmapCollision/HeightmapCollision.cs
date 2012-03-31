@@ -368,22 +368,8 @@ namespace HeightmapCollision
                     }
                     result.Z = SphereRadius - i;
                     newSpherePosition.Y = result.Y;
-                    if (velocity.X > 0)
-                    {
-                        newSpherePosition.X -= result.X;
-                    }
-                    else if (velocity.X < 0)
-                    {
-                        newSpherePosition.X += result.X;
-                    }
-                    if (velocity.Z > 0)
-                    {
-                        newSpherePosition.Z -= result.Z;
-                    }
-                    else if (velocity.Z < 0)
-                    {
-                        newSpherePosition.Z += result.Z;
-                    }
+                    newSpherePosition.X -= result.X;
+                    newSpherePosition.Z -= result.Z;
                 }
 
                 
