@@ -154,8 +154,9 @@ namespace HeightmapCollision
             {
                 // we don't want the camera to go beneath the terrain's height +
                 // a small offset.
-                float minimumHeight =
-                    heightMapInfo.GetHeight(cameraPosition) + CameraPositionOffset.Y;
+                float minimumHeight;
+                Vector3 dummyNormal;
+                heightMapInfo.GetHeightAndNormal(cameraPosition, out minimumHeight, out dummyNormal);
 
                 if (cameraPosition.Y < minimumHeight)
                 {
@@ -310,8 +311,23 @@ namespace HeightmapCollision
                 // the size of the sphere. If we didn't offset by the size of the
                 // sphere, it would be drawn halfway through the world, which looks 
                 // a little odd.
-                newSpherePosition.Y = heightMapInfo.GetHeight(newSpherePosition) +
-                    SphereRadius;
+                float oldHeight;
+                Vector3 oldNormal;
+                float newHeight;
+                Vector3 newNormal;
+                heightMapInfo.GetHeightAndNormal(spherePosition, out oldHeight, out oldNormal);
+                heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
+
+                if (oldHeight < newHeight)
+                {
+                    newSpherePosition = spherePosition;
+                }
+                else
+                {
+                    newSpherePosition.Y = newHeight + SphereRadius;
+                }
+
+                
             }
             else
             {

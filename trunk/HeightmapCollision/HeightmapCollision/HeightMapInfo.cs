@@ -21,8 +21,8 @@ namespace HeightmapCollision
     /// HeightMapInfo is a collection of data about the heightmap. It includes
     /// information about how high the terrain is, and how far apart each vertex is.
     /// It also has several functions to get information about the heightmap, including
-    /// its height at different points, and whether a point is on the heightmap.
-    /// It is the runtime equivalent of HeightMapInfoContent.
+    /// its height and normal at different points, and whether a point is on the 
+    /// heightmap. It is the runtime equivalent of HeightMapInfoContent.
     /// </summary>
     public class HeightMapInfo
     {
@@ -38,6 +38,8 @@ namespace HeightmapCollision
         // heightmap is.
         private float[,] heights;
 
+        private Vector3[,] normals;
+
         // the position of the heightmap's -x, -z corner, in worldspace.
         private Vector3 heightmapPosition;
 
@@ -52,21 +54,26 @@ namespace HeightmapCollision
 
 
         // the constructor will initialize all of the member variables.
-        public HeightMapInfo(float[,] heights, float terrainScale)
+        public HeightMapInfo(float[,] heights, Vector3[,] normals, float terrainScale)
         {
             if (heights == null)
             {
                 throw new ArgumentNullException("heights");
             }
+            if (normals == null)
+            {
+                throw new ArgumentNullException("normals");
+            }
 
             this.terrainScale = terrainScale;
             this.heights = heights;
+            this.normals = normals;
 
             heightmapWidth = (heights.GetLength(0) - 1) * terrainScale;
             heightmapHeight = (heights.GetLength(1) - 1) * terrainScale;
 
-            heightmapPosition.X = -(heights.GetLength(0) - 1) / 2 * terrainScale;
-            heightmapPosition.Z = -(heights.GetLength(1) - 1) / 2 * terrainScale;
+            heightmapPosition.X = -(heights.GetLength(0) - 1) / 2.0f * terrainScale;
+            heightmapPosition.Z = -(heights.GetLength(1) - 1) / 2.0f * terrainScale;
         }
 
 
@@ -85,11 +92,11 @@ namespace HeightmapCollision
                 positionOnHeightmap.Z < heightmapHeight);
         }
 
-        // This function takes in a position, and returns the heightmap's height at that
-        // point. Be careful - this function will throw an IndexOutOfRangeException if
-        // position isn't on the heightmap!
-        // This function is explained in more detail in the accompanying doc.
-        public float GetHeight(Vector3 position)
+        // This function takes in a position, and has two out parameters: the 
+        // heightmap's height and normal at that point. Be careful - this function will 
+        // throw an IndexOutOfRangeException if position isn't on the heightmap!        
+        public void GetHeightAndNormal
+            (Vector3 position, out float height, out Vector3 normal)
         {
             // the first thing we need to do is figure out where on the heightmap
             // "position" is. This'll make the math much simpler later.
@@ -127,7 +134,21 @@ namespace HeightmapCollision
 
             // next, interpolate between those two values to calculate the height at our
             // position.
-            return MathHelper.Lerp(topHeight, bottomHeight, zNormalized);
+            height = MathHelper.Lerp(topHeight, bottomHeight, zNormalized);
+
+            // We'll repeat the same process to calculate the normal.
+            Vector3 topNormal = Vector3.Lerp(
+                normals[left, top],
+                normals[left + 1, top],
+                xNormalized);
+
+            Vector3 bottomNormal = Vector3.Lerp(
+                normals[left, top + 1],
+                normals[left + 1, top + 1],
+                xNormalized);
+
+            normal = Vector3.Lerp(topNormal, bottomNormal, zNormalized);
+            normal.Normalize();
         }
     }
 
@@ -146,6 +167,7 @@ namespace HeightmapCollision
             int width = input.ReadInt32();
             int height = input.ReadInt32();
             float[,] heights = new float[width, height];
+            Vector3[,] normals = new Vector3[width, height];
 
             for (int x = 0; x < width; x++)
             {
@@ -154,7 +176,14 @@ namespace HeightmapCollision
                     heights[x, z] = input.ReadSingle();
                 }
             }
-            return new HeightMapInfo(heights, terrainScale);
+            for (int x = 0; x < width; x++)
+            {
+                for (int z = 0; z < height; z++)
+                {
+                    normals[x, z] = input.ReadVector3();
+                }
+            }
+            return new HeightMapInfo(heights, normals, terrainScale);
         }
     }
 }
