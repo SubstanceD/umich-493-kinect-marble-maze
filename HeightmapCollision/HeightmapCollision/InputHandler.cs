@@ -92,6 +92,13 @@ namespace HeightmapCollision
             return false;
         }
 
+        //get mouse data
+
+        public MouseState getMouse()
+        {
+            return currentMouseState;
+        }
+
 
         //get hand position
         public Vector2 getHandPosition()
