@@ -24,7 +24,7 @@ namespace HeightmapCollision
 
     public enum GameState
     {
-        MAINMENU, INGAME, NOCHANGE
+        MAINMENU, INGAME, NOCHANGE, EXIT
     };
 
     public class HeightmapCollisionGame : Microsoft.Xna.Framework.Game
@@ -59,6 +59,16 @@ namespace HeightmapCollision
 
         #region Fields
 
+        Button startButton;
+        Button exitButton;
+
+        Texture2D cursor;
+        Vector2 cursorPos;
+
+        SpriteBatch spriteBatch;
+
+        Rectangle startPos;
+        Rectangle exitPos;
 
         GraphicsDeviceManager graphics;
 
@@ -116,7 +126,7 @@ namespace HeightmapCollision
         protected override void LoadContent()
         {
             terrain = Content.Load<Model>("terrain");
-
+            spriteBatch = new SpriteBatch(GraphicsDevice);
             // The terrain processor attached a HeightMapInfo to the terrain model's
             // Tag. We'll save that to a member variable now, and use it to
             // calculate the terrain's heights later.
@@ -128,8 +138,18 @@ namespace HeightmapCollision
                     "TerrainProcessor?";
                 throw new InvalidOperationException(message);
             }
-
+            
             sphere = Content.Load<Model>("sphere");
+
+            startPos = new Rectangle(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2,
+                Content.Load<Texture2D>("PlayButton").Width, Content.Load<Texture2D>("PlayButtonHi").Height);
+            exitPos = new Rectangle(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2 + 200,
+                Content.Load<Texture2D>("ExitButton").Width, Content.Load<Texture2D>("ExitButtonHi").Height);
+
+            cursor = Content.Load<Texture2D>("Cursor");
+
+            exitButton = new Button(exitPos, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.EXIT);
+            startButton = new Button(startPos, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.INGAME);
         }
 
 
@@ -152,7 +172,30 @@ namespace HeightmapCollision
                     UpdateCamera();
                     break;
                 case GameState.MAINMENU:
-                    currentState = GameState.INGAME;
+                    //currentState = GameState.INGAME;
+
+                    GameState buttonState;
+
+                    buttonState = startButton.Update(gameTime, input.getMouse(), input.getHandPosition());
+
+                    if (buttonState != GameState.NOCHANGE)
+                    {
+                        currentState = buttonState;
+                        break;
+                    }
+
+                    buttonState = exitButton.Update(gameTime, input.getMouse(), input.getHandPosition());
+
+                    if (buttonState != GameState.NOCHANGE)
+                    {
+                        currentState = buttonState;
+                        break;
+                    }
+
+                    cursorPos = new Vector2(input.getMouse().X, input.getMouse().Y);
+                    break;
+                case GameState.EXIT:
+                    this.Exit();
                     break;
                 default:
                     //error message here
@@ -232,6 +275,11 @@ namespace HeightmapCollision
 
                     break;
                 case GameState.MAINMENU:
+                    spriteBatch.Begin();
+                    startButton.Draw(spriteBatch);
+                    exitButton.Draw(spriteBatch);
+                    spriteBatch.Draw(cursor, cursorPos, Color.White);
+                    spriteBatch.End();
                     break;
                 default:
                     //error message
