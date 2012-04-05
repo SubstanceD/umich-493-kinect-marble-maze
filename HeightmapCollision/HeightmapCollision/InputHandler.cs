@@ -33,7 +33,15 @@ namespace HeightmapCollision
                 sensor = KinectSensor.KinectSensors[0];
                 if (sensor.Status == KinectStatus.Connected)
                 {
-                    sensor.SkeletonStream.Enable();
+                    TransformSmoothParameters parameters = new TransformSmoothParameters
+                    {
+                        Smoothing = 1.0f,
+                        Correction = 0.1f,
+                        JitterRadius = 0.05f,
+                        MaxDeviationRadius = 0.05f,
+                        Prediction = 0.1f
+                    };
+                    sensor.SkeletonStream.Enable(parameters);
                 }
                 sensor.Start();
             }
