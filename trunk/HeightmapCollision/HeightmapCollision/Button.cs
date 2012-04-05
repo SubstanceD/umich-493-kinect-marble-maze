@@ -95,7 +95,7 @@ namespace HeightmapCollision
         {
             if (position.X > rect.Left && position.X < rect.Right
                 && position.Y > rect.Top && position.Y < rect.Bottom)
-                return false;
+                return true;
             return false;
         }
     }
