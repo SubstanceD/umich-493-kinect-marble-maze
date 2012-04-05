@@ -345,6 +345,7 @@ namespace HeightmapCollision
                 heightMapInfo.GetHeightAndNormal(spherePosition, out oldHeight, out oldNormal);
                 heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
 
+                Vector3 checkSpherePosition = newSpherePosition;
                 if (oldHeight < newHeight) //Need to add normal calculation if we use ramps
                 {
                     newSpherePosition = spherePosition;
@@ -358,52 +359,39 @@ namespace HeightmapCollision
                         gravity = true;
                     }
                     result.Y = spherePosition.Y;
-                    Vector3 checkForWalls = newSpherePosition;
-                    float i = 0;
+                    result.X = newSpherePosition.X - spherePosition.X;
+                    result.Z = newSpherePosition.Z - spherePosition.Z;
+                    Console.WriteLine("X: {0} Z: {0}", result.X, result.Z);
 
-                    while (i < SphereRadius)
+                    checkSpherePosition.Y = spherePosition.Y;
+                    checkSpherePosition.X += SphereRadius * Math.Sign(result.X);
+                    checkSpherePosition.Z += SphereRadius * Math.Sign(result.Z);
+                    bool radiusCheck = false;
+                    if (heightMapInfo.IsOnHeightmap(checkSpherePosition))
                     {
-                        checkForWalls.X += i;
-                        if (heightMapInfo.IsOnHeightmap(checkForWalls))
+                        heightMapInfo.GetHeightAndNormal(checkSpherePosition, out newHeight, out newNormal);
+                        if (newHeight > oldHeight)
                         {
-                            heightMapInfo.GetHeightAndNormal(checkForWalls, out newHeight, out newNormal);
-                            if (newHeight != oldHeight)
-                            {
-                                break;
-                            }
+                            radiusCheck = true;
                         }
-                        else 
-                        {
-                            break;
-                        }
-                        i++;
                     }
-                    result.X = SphereRadius - i;
-                    i = 0;
-                    while (i < SphereRadius)
+                    else
                     {
-                        checkForWalls.Z += i;
-                        if (heightMapInfo.IsOnHeightmap(checkForWalls))
-                        {
-                            heightMapInfo.GetHeightAndNormal(checkForWalls, out newHeight, out newNormal);
-                            if (newHeight != oldHeight)
-                            {
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                        i++;
+                        radiusCheck = true;
                     }
-                    result.Z = SphereRadius - i;
-                    newSpherePosition.Y = result.Y;
-                    newSpherePosition.X -= result.X;
-                    newSpherePosition.Z -= result.Z;
-                }
-
-                
+                    if (radiusCheck)
+                    {
+                        newSpherePosition.Y = result.Y;
+                        newSpherePosition.X -= SphereRadius * Math.Sign(result.X); ;
+                        newSpherePosition.Z -= SphereRadius * Math.Sign(result.Z); ;
+                    }
+                    else
+                    {
+                        newSpherePosition.Y = result.Y;
+                        //newSpherePosition.X = result.X;
+                       // newSpherePosition.Z = result.Z;
+                    }
+                }                
             }
             else
             {
