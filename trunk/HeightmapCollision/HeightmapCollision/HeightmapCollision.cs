@@ -41,6 +41,9 @@ namespace HeightmapCollision
         // and when computing how far the sphere has rolled.
         const float SphereRadius = 12.0f;
 
+        //value used for falling ball
+        const float gravityConst = 15f;
+
         // This vector controls how much the camera's position is offset from the
         // sphere. This value can be changed to move the camera further away from or
         // closer to the sphere.
@@ -49,6 +52,7 @@ namespace HeightmapCollision
         // This value controls the point the camera will aim at. This value is an offset
         // from the sphere's position.
         readonly Vector3 CameraTargetOffset = new Vector3(0, 30, 0);
+
 
 
         #endregion
@@ -74,6 +78,10 @@ namespace HeightmapCollision
 
         GameState currentState;
 
+        float oldHeight;
+        float newHeight;
+
+        bool gravity;
 
         #endregion
 
@@ -85,6 +93,7 @@ namespace HeightmapCollision
             graphics = new GraphicsDeviceManager(this);
             input = new InputHandler(graphics);
             Content.RootDirectory = "Content";
+            gravity = false;
         }
 
         protected override void Initialize()
@@ -209,6 +218,22 @@ namespace HeightmapCollision
 
             device.Clear(Color.Black);
 
+            if (gravity)
+            {
+                if ((spherePosition.Y - gravityConst) > (newHeight + SphereRadius))
+                {
+                    spherePosition.Y -= gravityConst;
+                }
+                else
+                {
+                    spherePosition.Y = newHeight + SphereRadius;
+                    gravity = false;
+                }
+            }
+            else
+            {
+                spherePosition.Y = oldHeight + SphereRadius;
+            }
             switch (currentState)
             {
                 case GameState.INGAME:
@@ -313,9 +338,9 @@ namespace HeightmapCollision
                 // the size of the sphere. If we didn't offset by the size of the
                 // sphere, it would be drawn halfway through the world, which looks 
                 // a little odd.
-                float oldHeight;
+                
                 Vector3 oldNormal;
-                float newHeight;
+                
                 Vector3 newNormal;
                 heightMapInfo.GetHeightAndNormal(spherePosition, out oldHeight, out oldNormal);
                 heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
@@ -327,7 +352,12 @@ namespace HeightmapCollision
                 else //newHeight <= oldHeight
                 {
                     Vector3 result;
-                    result.Y = newHeight + SphereRadius;
+                    
+                    if (newHeight < oldHeight)
+                    {
+                        gravity = true;
+                    }
+                    result.Y = spherePosition.Y;
                     Vector3 checkForWalls = newSpherePosition;
                     float i = 0;
 
