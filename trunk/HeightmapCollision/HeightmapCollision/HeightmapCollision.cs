@@ -42,7 +42,7 @@ namespace HeightmapCollision
         const float SphereRadius = 12.0f;
 
         //value used for falling ball
-        const float gravityConst = 15f;
+        const float gravityConst = 1f;
 
         // This vector controls how much the camera's position is offset from the
         // sphere. This value can be changed to move the camera further away from or
@@ -218,22 +218,6 @@ namespace HeightmapCollision
 
             device.Clear(Color.Black);
 
-            if (gravity)
-            {
-                if ((spherePosition.Y - gravityConst) > (newHeight + SphereRadius))
-                {
-                    spherePosition.Y -= gravityConst;
-                }
-                else
-                {
-                    spherePosition.Y = newHeight + SphereRadius;
-                    gravity = false;
-                }
-            }
-            else
-            {
-                spherePosition.Y = oldHeight + SphereRadius;
-            }
             switch (currentState)
             {
                 case GameState.INGAME:
@@ -319,6 +303,18 @@ namespace HeightmapCollision
             movement.Z = input.moveAmount();
             movement.X = input.strafeAmount();
 
+            if (gravity)
+            {
+                if ((spherePosition.Y - gravityConst) > (newHeight + SphereRadius))
+                {
+                    movement.Y = -gravityConst;
+                }
+                else
+                {
+                    spherePosition.Y = newHeight + SphereRadius;
+                    gravity = false;
+                }
+            }
             // next, we'll create a rotation matrix from the sphereFacingDirection, and
             // use it to transform the vector. If we didn't do this, pressing "up" would
             // always move the ball along +Z. By transforming it, we can move in the
@@ -331,6 +327,7 @@ namespace HeightmapCollision
             // vector, newSpherePosition, which will represent where the user wants to
             // go. If that value is on the heightmap, we'll allow the move.
             Vector3 newSpherePosition = spherePosition + velocity;
+
             if (heightMapInfo.IsOnHeightmap(newSpherePosition))
             {
                 // finally, we need to see how high the terrain is at the sphere's new
@@ -344,7 +341,10 @@ namespace HeightmapCollision
                 Vector3 newNormal;
                 heightMapInfo.GetHeightAndNormal(spherePosition, out oldHeight, out oldNormal);
                 heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
-
+                if (!gravity)
+                {
+                    newSpherePosition.Y = oldHeight + SphereRadius;
+                }
                 Vector3 checkSpherePosition = newSpherePosition;
                 if (oldHeight < newHeight) //Need to add normal calculation if we use ramps
                 {
@@ -358,10 +358,9 @@ namespace HeightmapCollision
                     {
                         gravity = true;
                     }
-                    result.Y = spherePosition.Y;
+                    result.Y = oldHeight + SphereRadius;
                     result.X = newSpherePosition.X - spherePosition.X;
                     result.Z = newSpherePosition.Z - spherePosition.Z;
-                    Console.WriteLine("X: {0} Z: {0}", result.X, result.Z);
 
                     checkSpherePosition.Y = spherePosition.Y;
                     checkSpherePosition.X += SphereRadius * Math.Sign(result.X);
@@ -385,12 +384,7 @@ namespace HeightmapCollision
                         newSpherePosition.X -= SphereRadius * Math.Sign(result.X); ;
                         newSpherePosition.Z -= SphereRadius * Math.Sign(result.Z); ;
                     }
-                    else
-                    {
-                        newSpherePosition.Y = result.Y;
-                        //newSpherePosition.X = result.X;
-                       // newSpherePosition.Z = result.Z;
-                    }
+
                 }                
             }
             else
