@@ -171,6 +171,16 @@ namespace HeightmapCollision
             return false;
         }
 
+        //jump
+        public bool jumped()
+        {
+            if (currentKeyboardState.IsKeyDown(Keys.Space))
+            {
+                return true;
+            }
+            return false;
+        }
+
         //exit
         public bool exit()
         {
