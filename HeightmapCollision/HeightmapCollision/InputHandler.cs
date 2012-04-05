@@ -190,6 +190,13 @@ namespace HeightmapCollision
             return false;
         }
 
+        public bool reset()
+        {
+            if (currentKeyboardState.IsKeyDown(Keys.R))
+                return true;
+            return false;
+        }
+
         //get mouse data
 
         public MouseState getMouse()
