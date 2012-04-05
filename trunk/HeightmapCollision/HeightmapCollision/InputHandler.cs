@@ -80,13 +80,36 @@ namespace HeightmapCollision
         //move forward amount
         public float moveAmount()
         {
-            return 0;
+            float result = -currentGamePadState.ThumbSticks.Left.Y;
+
+            if (currentKeyboardState.IsKeyDown(Keys.W) ||
+                currentKeyboardState.IsKeyDown(Keys.Up) ||
+                currentGamePadState.DPad.Up == ButtonState.Pressed)
+            {
+                result -= 1;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.S) ||
+                currentKeyboardState.IsKeyDown(Keys.Down) ||
+                currentGamePadState.DPad.Down == ButtonState.Pressed)
+            {
+                result += 1;
+            }
+            result = MathHelper.Clamp(result, -1, 1);
+
+            return result;
         }
 
         //strafe amount
         public float strafeAmount()
         {
-            return 0;
+            float result = 0;
+            if (currentKeyboardState.IsKeyDown(Keys.Z))
+                result -= 1;
+            if (currentKeyboardState.IsKeyDown(Keys.X))
+                result += 1;
+            result = MathHelper.Clamp(result, -1, 1);
+
+            return result;
         }
 
         //turn amount

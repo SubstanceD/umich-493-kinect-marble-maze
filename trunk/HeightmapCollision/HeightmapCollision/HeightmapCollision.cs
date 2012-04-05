@@ -21,6 +21,12 @@ namespace HeightmapCollision
     /// Sample showing how to use get the height of a programmatically generated
     /// heightmap.
     /// </summary>
+
+    public enum GameState
+    {
+        MAINMENU, INGAME
+    };
+
     public class HeightmapCollisionGame : Microsoft.Xna.Framework.Game
     {
         #region Constants
@@ -66,6 +72,8 @@ namespace HeightmapCollision
 
         InputHandler input;
 
+        GameState currentState;
+
 
         #endregion
 
@@ -84,6 +92,8 @@ namespace HeightmapCollision
             // now that the GraphicsDevice has been created, we can create the projection matrix.
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.ToRadians(45.0f), GraphicsDevice.Viewport.AspectRatio, 1f, 10000);
+
+            currentState = GameState.MAINMENU;
 
             base.Initialize();
         }
@@ -122,9 +132,21 @@ namespace HeightmapCollision
         /// </summary>
         protected override void Update(GameTime gameTime)
         {
-            HandleInput();
+            input.update();
 
-            UpdateCamera();
+            switch (currentState)
+            {
+                case GameState.INGAME:
+                    HandleInput();
+                    UpdateCamera();
+                    break;
+                case GameState.MAINMENU:
+                    currentState = GameState.INGAME;
+                    break;
+                default:
+                    //error message here
+                    break;
+            }
 
             base.Update(gameTime);
         }
@@ -187,13 +209,24 @@ namespace HeightmapCollision
 
             device.Clear(Color.Black);
 
-            DrawModel(terrain, Matrix.Identity);
+            switch (currentState)
+            {
+                case GameState.INGAME:
+                    DrawModel(terrain, Matrix.Identity);
+                    DrawModel(sphere, sphereRollingMatrix *
+                        Matrix.CreateTranslation(spherePosition));
 
-            DrawModel(sphere, sphereRollingMatrix *
-                Matrix.CreateTranslation(spherePosition));
+                    // If there was any alpha blended translucent geometry in
+                    // the scene, that would be drawn here.
 
-            // If there was any alpha blended translucent geometry in
-            // the scene, that would be drawn here.
+                    break;
+                case GameState.MAINMENU:
+                    break;
+                default:
+                    //error message
+                    break;
+            }
+
 
             base.Draw(gameTime);
         }
@@ -241,10 +274,6 @@ namespace HeightmapCollision
         /// </summary>
         private void HandleInput()
         {
-            input.update();
-            KeyboardState currentKeyboardState = Keyboard.GetState();
-            GamePadState currentGamePadState = GamePad.GetState(PlayerIndex.One);
-
             // Check for exit.
             if (input.exit())
             {
@@ -262,20 +291,8 @@ namespace HeightmapCollision
             // we'll create a Vector3 and modify use the user's input to modify the Z
             // component, which corresponds to the forward direction.
             Vector3 movement = Vector3.Zero;
-            movement.Z = -currentGamePadState.ThumbSticks.Left.Y;
-
-            if (currentKeyboardState.IsKeyDown(Keys.W) ||
-                currentKeyboardState.IsKeyDown(Keys.Up) ||
-                currentGamePadState.DPad.Up == ButtonState.Pressed)
-            {
-                movement.Z = -1;
-            }
-            if (currentKeyboardState.IsKeyDown(Keys.S) ||
-                currentKeyboardState.IsKeyDown(Keys.Down) ||
-                currentGamePadState.DPad.Down == ButtonState.Pressed)
-            {
-                movement.Z = 1;
-            }
+            movement.Z = input.moveAmount();
+            movement.X = input.strafeAmount();
 
             // next, we'll create a rotation matrix from the sphereFacingDirection, and
             // use it to transform the vector. If we didn't do this, pressing "up" would
