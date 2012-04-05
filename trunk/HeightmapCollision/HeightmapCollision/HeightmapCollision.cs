@@ -24,7 +24,7 @@ namespace HeightmapCollision
 
     public enum GameState
     {
-        MAINMENU, INGAME
+        MAINMENU, INGAME, NOCHANGE
     };
 
     public class HeightmapCollisionGame : Microsoft.Xna.Framework.Game
