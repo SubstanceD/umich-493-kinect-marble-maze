@@ -93,7 +93,7 @@ namespace HeightmapCollision
 
         bool overlap(Vector2 position, Rectangle rect)
         {
-            if (position.X > rect.Left && position.X < rect.Left
+            if (position.X > rect.Left && position.X < rect.Right
                 && position.Y > rect.Top && position.Y < rect.Bottom)
                 return false;
             return false;
