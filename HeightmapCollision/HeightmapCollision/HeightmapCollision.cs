@@ -42,7 +42,7 @@ namespace HeightmapCollision
         const float SphereRadius = 12.0f;
 
         //value used for falling ball
-        const float gravityConst = 1f;
+        const float gravityConst = .2f;
 
         // This vector controls how much the camera's position is offset from the
         // sphere. This value can be changed to move the camera further away from or
@@ -82,6 +82,8 @@ namespace HeightmapCollision
         float newHeight;
 
         bool gravity;
+
+        Vector3 movement;
 
         #endregion
 
@@ -299,7 +301,7 @@ namespace HeightmapCollision
             // Next, we want to move the sphere forward or back. to do this, 
             // we'll create a Vector3 and modify use the user's input to modify the Z
             // component, which corresponds to the forward direction.
-            Vector3 movement = Vector3.Zero;
+            
             movement.Z = input.moveAmount();
             movement.X = input.strafeAmount();
 
@@ -307,12 +309,13 @@ namespace HeightmapCollision
             {
                 if ((spherePosition.Y - gravityConst) > (newHeight + SphereRadius))
                 {
-                    movement.Y = -gravityConst;
+                    movement.Y -= gravityConst;
                 }
                 else
                 {
                     spherePosition.Y = newHeight + SphereRadius;
                     gravity = false;
+                    movement.Y = 0;
                 }
             }
             // next, we'll create a rotation matrix from the sphereFacingDirection, and
@@ -341,6 +344,7 @@ namespace HeightmapCollision
                 Vector3 newNormal;
                 heightMapInfo.GetHeightAndNormal(spherePosition, out oldHeight, out oldNormal);
                 heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
+                
                 if (!gravity)
                 {
                     newSpherePosition.Y = oldHeight + SphereRadius;
@@ -348,13 +352,21 @@ namespace HeightmapCollision
                 Vector3 checkSpherePosition = newSpherePosition;
                 if (oldHeight < newHeight) //Need to add normal calculation if we use ramps
                 {
-                    newSpherePosition = spherePosition;
+                    if ((Math.Acos(Vector3.Dot(newNormal, Vector3.Up))) < .4)
+                    {
+                        Console.WriteLine("I am here: {0}", Math.Acos(Vector3.Dot(newNormal, Vector3.Up)));
+                    }
+                    else
+                    {
+                        Console.WriteLine("I am not going up a wall ever!");
+                        newSpherePosition = spherePosition;
+                    }
                 }
                 else //newHeight <= oldHeight
                 {
                     Vector3 result;
                     
-                    if (newHeight < oldHeight)
+                    if (newHeight < oldHeight + SphereRadius)
                     {
                         gravity = true;
                     }
