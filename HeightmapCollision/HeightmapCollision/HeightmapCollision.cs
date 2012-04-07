@@ -402,11 +402,11 @@ namespace HeightmapCollision
                 {
                     if ((Math.Acos(Vector3.Dot(newNormal, Vector3.Up))) < .4)
                     {
-                        Console.WriteLine("I am here: {0}", Math.Acos(Vector3.Dot(newNormal, Vector3.Up)));
+                       // Console.WriteLine("I am here: {0}", Math.Acos(Vector3.Dot(newNormal, Vector3.Up)));
                     }
                     else
                     {
-                        Console.WriteLine("I am not going up a wall ever!");
+                        //Console.WriteLine("I am not going up a wall ever!");
                         newSpherePosition = spherePosition;
                     }
                 }
