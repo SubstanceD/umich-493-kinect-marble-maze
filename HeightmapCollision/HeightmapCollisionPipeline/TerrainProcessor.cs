@@ -110,8 +110,12 @@ namespace HeightmapCollisionPipeline
 
             string directory = Path.GetDirectoryName(input.Identity.SourceFilename);
             string texture = Path.Combine(directory, terrainTextureFilename);
+            string testTexture = Path.Combine(directory, "test.bmp");
 
             material.Texture = new ExternalReference<TextureContent>(texture);
+
+            BasicMaterialContent finishMaterial = new BasicMaterialContent();
+            finishMaterial.Texture = new ExternalReference<TextureContent>(testTexture);
 
             builder.SetMaterial(material);
 
@@ -119,11 +123,26 @@ namespace HeightmapCollisionPipeline
             int texCoordId = builder.CreateVertexChannel<Vector2>(
                                             VertexChannelNames.TextureCoordinate(0));
 
+            int xMin, xMax, yMin, yMax;
+            xMin = 210;
+            xMax = 220;
+            yMin = 210;
+            yMax = 220;
+
             // Create the individual triangles that make up our terrain.
             for (int y = 0; y < heightfield.Height - 1; y++)
             {
                 for (int x = 0; x < heightfield.Width - 1; x++)
                 {
+                    if ((x >= xMin) && (x <= xMax) && (y >= yMin) && (y <= yMax))
+                    //if (x > 128)
+                    {
+                        builder.SetMaterial(finishMaterial);
+                    }
+                    else
+                    {
+                        builder.SetMaterial(material);
+                    }
                     AddVertex(builder, texCoordId, heightfield.Width, x, y);
                     AddVertex(builder, texCoordId, heightfield.Width, x + 1, y);
                     AddVertex(builder, texCoordId, heightfield.Width, x + 1, y + 1);

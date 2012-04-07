@@ -415,7 +415,7 @@ namespace HeightmapCollision
                 {
                     if ((Math.Acos(Vector3.Dot(newNormal, Vector3.Up))) < .4)
                     {
-                       // Console.WriteLine("I am here: {0}", Math.Acos(Vector3.Dot(newNormal, Vector3.Up)));
+                        //Console.WriteLine("I am here: {0}", Math.Acos(Vector3.Dot(newNormal, Vector3.Up)));
                     }
                     else
                     {
