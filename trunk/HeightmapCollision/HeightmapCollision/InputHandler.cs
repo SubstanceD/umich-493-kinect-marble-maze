@@ -273,7 +273,7 @@ namespace HeightmapCollision
         public Vector2 getHandPosition()
         {
             if (currentSkeleton == null)
-                return Vector2.Zero;
+                return new Vector2(-55);
 
             Vector2 handPosition = new Vector2();
 
