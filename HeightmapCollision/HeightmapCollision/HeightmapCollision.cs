@@ -146,9 +146,9 @@ namespace HeightmapCollision
             
             sphere = Content.Load<Model>("sphere");
 
-            startPos = new Rectangle(GraphicsDevice.Viewport.X, GraphicsDevice.Viewport.Y,
+            startPos = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("PlayButton").Width / 2, GraphicsDevice.Viewport.Height / 4 - Content.Load<Texture2D>("PlayButtonHi").Height/2,
                 Content.Load<Texture2D>("PlayButton").Width, Content.Load<Texture2D>("PlayButtonHi").Height);
-            exitPos = new Rectangle(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2 + 200,
+            exitPos = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("ExitButton").Width / 2, 2*GraphicsDevice.Viewport.Height / 3 - Content.Load<Texture2D>("ExitButtonHi").Height / 2,
                 Content.Load<Texture2D>("ExitButton").Width, Content.Load<Texture2D>("ExitButtonHi").Height);
 
             cursor = Content.Load<Texture2D>("Cursor");
@@ -199,6 +199,9 @@ namespace HeightmapCollision
 
             if (buttonState != GameState.NOCHANGE)
             {
+                graphics.GraphicsDevice.BlendState = BlendState.Opaque;
+                graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
                 currentState = buttonState;
                 return;
             }
@@ -270,7 +273,7 @@ namespace HeightmapCollision
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice device = graphics.GraphicsDevice;
-
+            
             device.Clear(Color.Black);
 
             switch (currentState)
@@ -279,7 +282,6 @@ namespace HeightmapCollision
                     DrawModel(terrain, Matrix.Identity);
                     DrawModel(sphere, sphereRollingMatrix *
                         Matrix.CreateTranslation(spherePosition));
-
                     // If there was any alpha blended translucent geometry in
                     // the scene, that would be drawn here.
 
