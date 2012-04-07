@@ -16,6 +16,7 @@ namespace HeightmapCollision
         KinectSensor sensor = null;
         Skeleton[] skeletons = null;
         Skeleton currentSkeleton = null;
+        float armLength;
 
         KeyboardState currentKeyboardState;
         GamePadState currentGamePadState;
@@ -35,7 +36,7 @@ namespace HeightmapCollision
                 {
                     TransformSmoothParameters parameters = new TransformSmoothParameters
                     {
-                        Smoothing = 1.0f,
+                        Smoothing = 0.3f,
                         Correction = 0.1f,
                         JitterRadius = 0.05f,
                         MaxDeviationRadius = 0.05f,
@@ -80,6 +81,7 @@ namespace HeightmapCollision
                             break;
                         }
                     }
+                    computeArmLength(); 
                 }
             }
 
@@ -92,13 +94,15 @@ namespace HeightmapCollision
 
             if (currentKeyboardState.IsKeyDown(Keys.W) ||
                 currentKeyboardState.IsKeyDown(Keys.Up) ||
-                currentGamePadState.DPad.Up == ButtonState.Pressed)
+                currentGamePadState.DPad.Up == ButtonState.Pressed ||
+                leaningForward())
             {
                 result -= 1;
             }
             if (currentKeyboardState.IsKeyDown(Keys.S) ||
                 currentKeyboardState.IsKeyDown(Keys.Down) ||
-                currentGamePadState.DPad.Down == ButtonState.Pressed)
+                currentGamePadState.DPad.Down == ButtonState.Pressed
+                || leaningBack())
             {
                 result += 1;
             }
@@ -111,13 +115,71 @@ namespace HeightmapCollision
         public float strafeAmount()
         {
             float result = 0;
-            if (currentKeyboardState.IsKeyDown(Keys.Z))
+            if (currentKeyboardState.IsKeyDown(Keys.Z) ||
+                leaningLeft())
                 result -= 1;
-            if (currentKeyboardState.IsKeyDown(Keys.X))
+            if (currentKeyboardState.IsKeyDown(Keys.X) ||
+                leaningRight())
                 result += 1;
             result = MathHelper.Clamp(result, -1, 1);
 
             return result;
+        }
+
+        bool leaningRight()
+        {
+            if (currentSkeleton != null)
+            {
+                Joint shoulder = currentSkeleton.Joints[JointType.ShoulderLeft];
+                Joint spine = currentSkeleton.Joints[JointType.Spine];
+
+                if (Math.Abs(shoulder.Position.X - spine.Position.X) < 0.15)
+                    return true;
+            }
+
+            return false;
+        }
+
+        bool leaningLeft()
+        {
+            if (currentSkeleton != null)
+            {
+                Joint shoulder = currentSkeleton.Joints[JointType.ShoulderRight];
+                Joint spine = currentSkeleton.Joints[JointType.Spine];
+
+                if (Math.Abs(shoulder.Position.X - spine.Position.X) < 0.15)
+                    return true;
+            }
+
+            return false;
+        }
+
+        bool leaningForward()
+        {
+            if (currentSkeleton != null)
+            {
+                Joint shoulder = currentSkeleton.Joints[JointType.ShoulderCenter];
+                Joint spine = currentSkeleton.Joints[JointType.Spine];
+
+                if (shoulder.Position.Z + 0.025f < spine.Position.Z)
+                    return true;
+            }
+
+            return false;
+        }
+
+        bool leaningBack()
+        {
+            if (currentSkeleton != null)
+            {
+                Joint shoulder = currentSkeleton.Joints[JointType.ShoulderCenter];
+                Joint spine = currentSkeleton.Joints[JointType.Spine];
+
+                if (shoulder.Position.Z - 0.07f  > spine.Position.Z)
+                    return true;
+            }
+
+            return false;
         }
 
         //turn amount
@@ -145,11 +207,12 @@ namespace HeightmapCollision
 
             return result;
         }
+
         bool rightArmExtended()
         {
             if (currentSkeleton == null)
                 return false;
-            float armLength = computeArmLength();
+
             Joint rHand = currentSkeleton.Joints[JointType.HandRight];
             Joint rShoulder = currentSkeleton.Joints[JointType.ShoulderRight];
 
@@ -158,11 +221,12 @@ namespace HeightmapCollision
 
             return false;
         }
+
         bool leftArmExtended()
         {
             if (currentSkeleton == null)
                 return false;
-            float armLength = computeArmLength();
+
             Joint lHand = currentSkeleton.Joints[JointType.HandLeft];
             Joint lShoulder = currentSkeleton.Joints[JointType.ShoulderLeft];
 
@@ -215,7 +279,6 @@ namespace HeightmapCollision
 
             Joint hand = currentSkeleton.Joints[JointType.HandRight];
 
-            float armLength = computeArmLength();
             float headY = currentSkeleton.Joints[JointType.Head].Position.Y;
             float spineY = currentSkeleton.Joints[JointType.Spine].Position.Y;
             float rShoulderX = currentSkeleton.Joints[JointType.ShoulderRight].Position.X;
@@ -240,12 +303,15 @@ namespace HeightmapCollision
             return handPosition;
         }
 
-        float computeArmLength()
+        void computeArmLength()
         {
-            Joint rShoulder = currentSkeleton.Joints[JointType.ShoulderRight];
-            Joint rElbow = currentSkeleton.Joints[JointType.ElbowRight];
+            if (currentSkeleton != null)
+            {
+                Joint rShoulder = currentSkeleton.Joints[JointType.ShoulderRight];
+                Joint rElbow = currentSkeleton.Joints[JointType.ElbowRight];
 
-            return distance(rShoulder, rElbow);
+                armLength = distance(rShoulder, rElbow);
+            }
         }
         float distance(Joint a, Joint b)
         {
