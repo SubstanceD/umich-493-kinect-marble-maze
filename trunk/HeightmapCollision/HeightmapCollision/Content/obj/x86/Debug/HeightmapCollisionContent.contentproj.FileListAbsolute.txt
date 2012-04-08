@@ -1,1 +1,2 @@
 C:\Users\bryan\Dropbox\Michigan\Winter12\EECS376\Homework\Homework6\HeightmapCollisionSample_4_0\HeightmapCollision\HeightmapCollision\Content\obj\x86\Debug\HeightmapCollisionContent.contentprojResolveAssemblyReference.cache
+C:\Users\bryan\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)\HeightmapCollision\HeightmapCollision\Content\obj\x86\Debug\HeightmapCollisionContent.contentprojResolveAssemblyReference.cache

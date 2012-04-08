@@ -1,4 +1,3 @@
-Content\terrain.xnb
 Content\ExitButton.xnb
 Content\PlayButton.xnb
 Content\ExitButtonHi.xnb
@@ -7,9 +6,15 @@ Content\Cursor.xnb
 Content\sphere.xnb
 Content\rocks_0.xnb
 Content\pawball_0.xnb
+<<<<<<< .mine
+Content\terrain.xnb
+Content\cube.xnb
+=======
 Content\ExitButton.xnb
 Content\PlayButton.xnb
 Content\ExitButtonHi.xnb
 Content\PlayButtonHi.xnb
 Content\Cursor.xnb
+>>>>>>> .r32
+Content\terrain.bmp
 Content\terrain.bmp

@@ -22,9 +22,26 @@ namespace HeightmapCollision
     /// heightmap.
     /// </summary>
 
+    public struct finishValues
+    {
+        public int xMin;
+        public int xMax;
+        public int yMin;
+        public int yMax;
+
+        public finishValues(int p, int p_2, int p_3, int p_4)
+        {
+            xMin = p;
+            xMax = p_2;
+            yMin = p_3;
+            yMax = p_4;
+        }
+    }
+
+
     public enum GameState
     {
-        MAINMENU, INGAME, NOCHANGE, EXIT, INGAME2P
+        MAINMENU, INGAME, NOCHANGE, EXIT, INGAME2P, FINISH
     };
 
     public class HeightmapCollisionGame : Microsoft.Xna.Framework.Game
@@ -100,6 +117,14 @@ namespace HeightmapCollision
 
         Vector3 movement;
 
+        public int currentLevel;
+
+        public static finishValues[] levelValues = new finishValues[]
+        {
+            new finishValues(210*12, 220*12, 210*12, 220*12), //Level One
+            //The twelve is a size that I can't figure out
+        };
+
         #endregion
 
         #region Initialization
@@ -113,8 +138,25 @@ namespace HeightmapCollision
             input = new InputHandler(graphics);
             Content.RootDirectory = "Content";
             gravity = false;
+            currentLevel = 0;
         }
 
+        bool isOnFinish(Vector3 s)
+        {
+            Console.WriteLine("X: {0} Z: {1}", s.X, s.Z);
+            if ((s.X <= levelValues[currentLevel].xMax) &&
+                (s.X >= levelValues[currentLevel].xMin) &&
+                (s.Z <= levelValues[currentLevel].yMax) &&
+                (s.Z >= levelValues[currentLevel].yMin))
+            {
+                currentState = GameState.MAINMENU; //For testing
+                //currentState = GameState.FINISH
+                return true;
+                
+            }
+            return false;
+        }
+        
         protected override void Initialize()
         {
             // now that the GraphicsDevice has been created, we can create the projection matrix.
@@ -145,12 +187,13 @@ namespace HeightmapCollision
         /// </summary>
         protected override void LoadContent()
         {
-            terrain = Content.Load<Model>("terrain");
+            terrain = Content.Load<Model>("level_1");
             spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
             // The terrain processor attached a HeightMapInfo to the terrain model's
             // Tag. We'll save that to a member variable now, and use it to
             // calculate the terrain's heights later.
             heightMapInfo = terrain.Tag as HeightMapInfo;
+            
             if (heightMapInfo == null)
             {
                 string message = "The terrain model did not have a HeightMapInfo " +
@@ -297,7 +340,7 @@ namespace HeightmapCollision
                     DrawModel(terrain, Matrix.Identity);
                     DrawModel(sphere, sphereRollingMatrix * 
                         Matrix.CreateTranslation(spherePosition));
-
+                    isOnFinish(spherePosition);
                     break;
                 case GameState.INGAME2P:
                     Viewport original = graphics.GraphicsDevice.Viewport;
@@ -306,15 +349,16 @@ namespace HeightmapCollision
                     DrawModel(terrain, Matrix.Identity);
                     DrawModel(sphere, sphereRollingMatrix *
                         Matrix.CreateTranslation(spherePosition));
+                    
                     graphics.GraphicsDevice.Viewport = rightViewport;
                     DrawModel(terrain, Matrix.Identity);
                     DrawModel(sphere, sphereRollingMatrix *
                         Matrix.CreateTranslation(spherePosition));
 
                     graphics.GraphicsDevice.Viewport = original;
+                    
                     // If there was any alpha blended translucent geometry in
                     // the scene, that would be drawn here.
-
                     break;
                 case GameState.MAINMENU:
                     spriteBatch.Begin();
@@ -324,6 +368,10 @@ namespace HeightmapCollision
                     spriteBatch.Draw(hand, handPos, Color.White);
                     spriteBatch.End();
                     break;
+                //case GameState.FINISH:
+                    //Need A notice that the player won as well as a next level button
+                    //And a exit button
+
                 default:
                     //error message
                     break;
@@ -442,7 +490,7 @@ namespace HeightmapCollision
                     newSpherePosition.Y = oldHeight + SphereRadius;
                 }
                 Vector3 checkSpherePosition = newSpherePosition;
-                if (oldHeight < newHeight) //Need to add normal calculation if we use ramps
+                if (oldHeight < newHeight) 
                 {
                     if ((Math.Acos(Vector3.Dot(newNormal, Vector3.Up))) < .4)
                     {
@@ -460,7 +508,14 @@ namespace HeightmapCollision
                     
                     if (newHeight < oldHeight + SphereRadius)
                     {
-                        gravity = true;
+                        if ((Math.Acos(Vector3.Dot(newNormal, Vector3.Up))) < .4)
+                        {
+                            //Console.WriteLine("I am here: {0}", Math.Acos(Vector3.Dot(newNormal, Vector3.Up)));
+                        }
+                        else
+                        {
+                            gravity = true;
+                        }
                     }
                     result.Y = oldHeight + SphereRadius;
                     result.X = newSpherePosition.X - spherePosition.X;
