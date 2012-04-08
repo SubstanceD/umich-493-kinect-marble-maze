@@ -24,7 +24,7 @@ namespace HeightmapCollision
 
     public enum GameState
     {
-        MAINMENU, INGAME, NOCHANGE, EXIT
+        MAINMENU, INGAME, NOCHANGE, EXIT, INGAME2P
     };
 
     public class HeightmapCollisionGame : Microsoft.Xna.Framework.Game
@@ -74,6 +74,8 @@ namespace HeightmapCollision
         Rectangle exitPos;
 
         GraphicsDeviceManager graphics;
+        Viewport leftViewport;
+        Viewport rightViewport;
 
         Model terrain;
 
@@ -120,6 +122,19 @@ namespace HeightmapCollision
                 MathHelper.ToRadians(45.0f), GraphicsDevice.Viewport.AspectRatio, 1f, 10000);
 
             currentState = GameState.MAINMENU;
+
+            Viewport original = graphics.GraphicsDevice.Viewport;
+
+            leftViewport = new Viewport();
+            leftViewport.X = original.X;
+            leftViewport.Y = original.Y;
+            leftViewport.Width = original.Width / 2;
+            leftViewport.Height = original.Height;
+
+            rightViewport.X = original.X + leftViewport.Width;
+            rightViewport.Y = original.Y;
+            rightViewport.Width = original.Width / 2;
+            rightViewport.Height = original.Height;
 
             base.Initialize();
         }
@@ -195,7 +210,7 @@ namespace HeightmapCollision
         {
             GameState buttonState;
 
-            buttonState = startButton.Update(gameTime, input.getMouse(), input.getHandPosition());
+            buttonState = startButton.Update(gameTime, input.getMouse(), input.getHandPosition(PlayerIndex.One));
 
             if (buttonState != GameState.NOCHANGE)
             {
@@ -206,7 +221,7 @@ namespace HeightmapCollision
                 return;
             }
 
-            buttonState = exitButton.Update(gameTime, input.getMouse(), input.getHandPosition());
+            buttonState = exitButton.Update(gameTime, input.getMouse(), input.getHandPosition(PlayerIndex.One));
 
             if (buttonState != GameState.NOCHANGE)
             {
@@ -215,7 +230,7 @@ namespace HeightmapCollision
             }
 
             cursorPos = new Vector2(input.getMouse().X, input.getMouse().Y);
-            handPos = input.getHandPosition();
+            handPos = input.getHandPosition(PlayerIndex.One);
         }
 
         /// <summary>
@@ -280,8 +295,23 @@ namespace HeightmapCollision
             {
                 case GameState.INGAME:
                     DrawModel(terrain, Matrix.Identity);
+                    DrawModel(sphere, sphereRollingMatrix * 
+                        Matrix.CreateTranslation(spherePosition));
+
+                    break;
+                case GameState.INGAME2P:
+                    Viewport original = graphics.GraphicsDevice.Viewport;
+
+                    graphics.GraphicsDevice.Viewport = leftViewport;
+                    DrawModel(terrain, Matrix.Identity);
                     DrawModel(sphere, sphereRollingMatrix *
                         Matrix.CreateTranslation(spherePosition));
+                    graphics.GraphicsDevice.Viewport = rightViewport;
+                    DrawModel(terrain, Matrix.Identity);
+                    DrawModel(sphere, sphereRollingMatrix *
+                        Matrix.CreateTranslation(spherePosition));
+
+                    graphics.GraphicsDevice.Viewport = original;
                     // If there was any alpha blended translucent geometry in
                     // the scene, that would be drawn here.
 
@@ -349,6 +379,7 @@ namespace HeightmapCollision
             // Check for exit.
             if (input.exit())
             {
+                spherePosition = Vector3.Zero;
                 currentState = GameState.MAINMENU;
             }
 
@@ -356,15 +387,15 @@ namespace HeightmapCollision
             // turn. turnAmount will be an accumulation of all the different possible
             // inputs.
 
-            sphereFacingDirection += input.turnAmount() *SphereTurnSpeed;
+            sphereFacingDirection += input.turnAmount(PlayerIndex.One) *SphereTurnSpeed;
 
 
             // Next, we want to move the sphere forward or back. to do this, 
             // we'll create a Vector3 and modify use the user's input to modify the Z
             // component, which corresponds to the forward direction.
             
-            movement.Z = input.moveAmount();
-            movement.X = input.strafeAmount();
+            movement.Z = input.moveAmount(PlayerIndex.One);
+            movement.X = input.strafeAmount(PlayerIndex.One);
 
             if (gravity)
             {

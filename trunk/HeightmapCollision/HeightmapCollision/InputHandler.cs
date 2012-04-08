@@ -16,10 +16,15 @@ namespace HeightmapCollision
         KinectSensor sensor = null;
         Skeleton[] skeletons = null;
         Skeleton currentSkeleton = null;
+        Skeleton skeletonPlayerOne = null;
+        Skeleton skeletonPlayerTwo = null;
+        int IDPlayerOne = -1;
+        int IDPlayerTwo = -1;
         float armLength;
+        float armLengthP1;
+        float armLengthP2;
 
         KeyboardState currentKeyboardState;
-        GamePadState currentGamePadState;
         MouseState currentMouseState;
 
         //for viewport use
@@ -37,10 +42,10 @@ namespace HeightmapCollision
                     TransformSmoothParameters parameters = new TransformSmoothParameters
                     {
                         Smoothing = 0.3f,
-                        Correction = 0.1f,
-                        JitterRadius = 0.05f,
-                        MaxDeviationRadius = 0.05f,
-                        Prediction = 0.1f
+                        Correction = 0.0f,
+                        JitterRadius = 0.0f,
+                        MaxDeviationRadius = 0.0f,
+                        Prediction = 0.0f
                     };
                     sensor.SkeletonStream.Enable(parameters);
                 }
@@ -52,8 +57,7 @@ namespace HeightmapCollision
         //update kinect information
         public void update()
         {
-            //Get mouse, gamepad, and keyboard info
-            currentGamePadState = GamePad.GetState(PlayerIndex.One);
+            //Get mouse, and keyboard info
             currentKeyboardState = Keyboard.GetState();
             currentMouseState = Mouse.GetState();
 
@@ -73,54 +77,119 @@ namespace HeightmapCollision
 
                     currentSkeleton = null;
 
+                    bool p1found = false;
+                    bool p2found = false;
+
                     for (int i = 0; i < sframe.SkeletonArrayLength; i++)
                     {
                         if (skeletons[i].TrackingState == SkeletonTrackingState.Tracked)
                         {
                             currentSkeleton = skeletons[i];
-                            break;
+                            if (currentSkeleton.TrackingId == IDPlayerOne)
+                            {
+                                skeletonPlayerOne = currentSkeleton;
+                                IDPlayerOne = skeletonPlayerOne.TrackingId;
+                                p1found = true;
+                            }
+                            else if (currentSkeleton.TrackingId == IDPlayerTwo)
+                            {
+                                skeletonPlayerTwo = currentSkeleton;
+                                IDPlayerTwo = skeletonPlayerTwo.TrackingId;
+                                p2found = true;
+                            }                            
                         }
                     }
-                    computeArmLength(); 
+                    if (!p1found || !p2found)
+                    {
+                        for (int i = 0; i < sframe.SkeletonArrayLength; i++)
+                        {
+                            if (skeletons[i].TrackingState == SkeletonTrackingState.Tracked)
+                            {
+                                currentSkeleton = skeletons[i];
+                                if (!p1found)
+                                {
+                                    skeletonPlayerOne = currentSkeleton;
+                                    IDPlayerOne = skeletonPlayerOne.TrackingId;
+                                    p1found = true;
+                                }
+                                else if (!p2found)
+                                {
+                                    skeletonPlayerTwo = currentSkeleton;
+                                    IDPlayerTwo = skeletonPlayerTwo.TrackingId;
+                                    p2found = true;
+                                }
+                            }
+                        }
+                    }
+
+                    currentSkeleton = skeletonPlayerOne;
+                    computeArmLength();
+                    sframe.Dispose();
                 }
             }
 
         }
 
         //move forward amount
-        public float moveAmount()
+        public float moveAmount(PlayerIndex player)
         {
-            float result = -currentGamePadState.ThumbSticks.Left.Y;
+            float result = 0;
 
-            if (currentKeyboardState.IsKeyDown(Keys.W) ||
-                currentKeyboardState.IsKeyDown(Keys.Up) ||
-                currentGamePadState.DPad.Up == ButtonState.Pressed ||
+            if (player == PlayerIndex.One)
+            {
+                currentSkeleton = skeletonPlayerOne;
+                if (currentKeyboardState.IsKeyDown(Keys.Up) ||
                 leaningForward())
-            {
-                result -= 1;
+                {
+                    result -= 1;
+                }
+                if (currentKeyboardState.IsKeyDown(Keys.Down) ||
+                    leaningBack())
+                {
+                    result += 1;
+                }
             }
-            if (currentKeyboardState.IsKeyDown(Keys.S) ||
-                currentKeyboardState.IsKeyDown(Keys.Down) ||
-                currentGamePadState.DPad.Down == ButtonState.Pressed
-                || leaningBack())
+            else if (player == PlayerIndex.Two)
             {
-                result += 1;
+                currentSkeleton = skeletonPlayerTwo;
+                if (currentKeyboardState.IsKeyDown(Keys.W) ||
+                leaningForward())
+                {
+                    result -= 1;
+                }
+                if (currentKeyboardState.IsKeyDown(Keys.S) ||
+                    leaningBack())
+                {
+                    result += 1;
+                }
             }
+
+            
             result = MathHelper.Clamp(result, -1, 1);
 
             return result;
         }
 
         //strafe amount
-        public float strafeAmount()
+        public float strafeAmount(PlayerIndex player)
         {
             float result = 0;
-            if (currentKeyboardState.IsKeyDown(Keys.Z) ||
-                leaningLeft())
-                result -= 1;
-            if (currentKeyboardState.IsKeyDown(Keys.X) ||
-                leaningRight())
-                result += 1;
+            if (player == PlayerIndex.One)
+            {
+                currentSkeleton = skeletonPlayerOne;
+                if (leaningLeft())
+                    result -= 1;
+                if (leaningRight())
+                    result += 1;
+            }
+            else if (player == PlayerIndex.Two)
+            {
+                currentSkeleton = skeletonPlayerTwo;
+                if (leaningLeft())
+                    result -= 1;
+                if (leaningRight())
+                    result += 1;
+            }
             result = MathHelper.Clamp(result, -1, 1);
 
             return result;
@@ -183,22 +252,37 @@ namespace HeightmapCollision
         }
 
         //turn amount
-        public float turnAmount()
+        public float turnAmount(PlayerIndex player)
         {
-            float result = -currentGamePadState.ThumbSticks.Left.X;
-            if (currentKeyboardState.IsKeyDown(Keys.A) ||
-                currentKeyboardState.IsKeyDown(Keys.Left) ||
-                currentGamePadState.DPad.Left == ButtonState.Pressed ||
-                leftArmExtended())
+            float result = 0;
+            if (player == PlayerIndex.One)
             {
-                result += 1;
+                currentSkeleton = skeletonPlayerOne;
+                
+                if (currentKeyboardState.IsKeyDown(Keys.Left) ||
+                    leftArmExtended())
+                {
+                    result += 1;
+                }
+                if (currentKeyboardState.IsKeyDown(Keys.Right) ||
+                    rightArmExtended())
+                {
+                    result -= 1;
+                }
             }
-            if (currentKeyboardState.IsKeyDown(Keys.D) ||
-                currentKeyboardState.IsKeyDown(Keys.Right) ||
-                currentGamePadState.DPad.Right == ButtonState.Pressed ||
-                rightArmExtended())
+            else if (player == PlayerIndex.Two)
             {
-                result -= 1;
+                currentSkeleton = skeletonPlayerTwo;
+                if (currentKeyboardState.IsKeyDown(Keys.A) ||
+                    leftArmExtended())
+                {
+                    result += 1;
+                }
+                if (currentKeyboardState.IsKeyDown(Keys.D) ||
+                    rightArmExtended())
+                {
+                    result -= 1;
+                }
             }
 
             // clamp the turn amount between -1 and 1, and then use the finished
@@ -248,8 +332,7 @@ namespace HeightmapCollision
         //exit
         public bool exit()
         {
-            if (currentKeyboardState.IsKeyDown(Keys.Escape) ||
-                currentGamePadState.Buttons.Back == ButtonState.Pressed)
+            if (currentKeyboardState.IsKeyDown(Keys.Escape))
                 return true;
             return false;
         }
@@ -270,8 +353,13 @@ namespace HeightmapCollision
 
 
         //get hand position
-        public Vector2 getHandPosition()
+        public Vector2 getHandPosition(PlayerIndex player)
         {
+            if (player == PlayerIndex.One)
+                currentSkeleton = skeletonPlayerOne;
+            else if (player == PlayerIndex.Two)
+                currentSkeleton = skeletonPlayerTwo;
+
             if (currentSkeleton == null)
                 return new Vector2(-55);
 
