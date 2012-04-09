@@ -117,12 +117,13 @@ namespace HeightmapCollision
         Vector3 movement;
 
         public int currentLevel;
-        static public int numLevels = 2;
+        static public int numLevels = 3;
 
         public static finishValues[] levelValues = new finishValues[]
         {
             new finishValues(2500, 2800, 2500, 2800), //Level One
             new finishValues(-3150, -2850, 2500, 2800), // Level Two
+            new finishValues(2600, 2750, 2600, 2750), //Level Three
             //This is the sphere position approximated
         };
 
@@ -462,19 +463,7 @@ namespace HeightmapCollision
             movement.Z = input.moveAmount(PlayerIndex.One);
             movement.X = input.strafeAmount(PlayerIndex.One);
 
-            if (gravity)
-            {
-                if ((spherePosition.Y - gravityConst) > (newHeight + SphereRadius))
-                {
-                    movement.Y -= gravityConst;
-                }
-                else
-                {
-                    spherePosition.Y = newHeight + SphereRadius;
-                    gravity = false;
-                    movement.Y = 0;
-                }
-            }
+
             // next, we'll create a rotation matrix from the sphereFacingDirection, and
             // use it to transform the vector. If we didn't do this, pressing "up" would
             // always move the ball along +Z. By transforming it, we can move in the
@@ -488,6 +477,23 @@ namespace HeightmapCollision
             // go. If that value is on the heightmap, we'll allow the move.
             Vector3 newSpherePosition = spherePosition + velocity;
 
+            Vector3 oldNormal;
+            Vector3 newNormal;
+            heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
+            if (gravity)
+            {
+                if ((spherePosition.Y - gravityConst) > (newHeight + SphereRadius))
+                {
+                    movement.Y -= gravityConst;
+                }
+                else
+                {
+                    spherePosition.Y = newHeight + SphereRadius;
+                    gravity = false;
+                    movement.Y = 0;
+                }
+            }
+
             if (heightMapInfo.IsOnHeightmap(newSpherePosition))
             {
                 // finally, we need to see how high the terrain is at the sphere's new
@@ -496,9 +502,7 @@ namespace HeightmapCollision
                 // sphere, it would be drawn halfway through the world, which looks 
                 // a little odd.
                 
-                Vector3 oldNormal;
-                
-                Vector3 newNormal;
+
                 heightMapInfo.GetHeightAndNormal(spherePosition, out oldHeight, out oldNormal);
                 heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
                 
@@ -516,14 +520,17 @@ namespace HeightmapCollision
                     else
                     {
                         //Console.WriteLine("I am not going up a wall ever!");
-                        newSpherePosition = spherePosition;
+                        if (!gravity)
+                        {
+                            newSpherePosition = spherePosition;
+                        }
                     }
                 }
                 else //newHeight <= oldHeight
                 {
                     Vector3 result;
                     
-                    if (newHeight < oldHeight + SphereRadius)
+                    if ((newHeight < oldHeight + SphereRadius) && (newHeight != oldHeight))
                     {
                         if ((Math.Acos(Vector3.Dot(newNormal, Vector3.Up))) < .4)
                         {
@@ -531,6 +538,7 @@ namespace HeightmapCollision
                         }
                         else
                         {
+                           // Console.WriteLine("I am here: {0}", Math.Acos(Vector3.Dot(newNormal, Vector3.Up)));
                             gravity = true;
                         }
                     }

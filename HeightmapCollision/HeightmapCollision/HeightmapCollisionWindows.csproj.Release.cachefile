@@ -1,20 +1,14 @@
-Content\ExitButton.xnb
-Content\PlayButton.xnb
-Content\ExitButtonHi.xnb
-Content\PlayButtonHi.xnb
-Content\Cursor.xnb
 Content\sphere.xnb
-Content\rocks_0.xnb
-Content\pawball_0.xnb
-<<<<<<< .mine
-Content\terrain.xnb
-Content\cube.xnb
-=======
 Content\ExitButton.xnb
 Content\PlayButton.xnb
 Content\ExitButtonHi.xnb
 Content\PlayButtonHi.xnb
 Content\Cursor.xnb
->>>>>>> .r32
-Content\terrain.bmp
-Content\terrain.bmp
+Content\YouWin.xnb
+Content\level_1.xnb
+Content\level_2.xnb
+Content\pawball_0.xnb
+Content\rocks_0.xnb
+Content\test_0.xnb
+Content\level_1.bmp
+Content\level_2.bmp
