@@ -97,6 +97,7 @@ namespace HeightmapCollisionPipeline
         {
             new finishValues(210, 220, 210, 220), //Level One
             new finishValues(25, 35, 210, 220), // Level Two
+            new finishValues(211,217,211,217), //Level Three
         };
 
 
@@ -158,6 +159,10 @@ namespace HeightmapCollisionPipeline
             if (fileName.Contains("level_2"))
             {
                 numLevel = 1;
+            }
+            if (fileName.Contains("level_3"))
+            {
+                numLevel = 2;
             }
            //  string[] tempFile = fileName.Split('_');
            //  fileName = tempFile[1];
