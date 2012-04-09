@@ -130,6 +130,9 @@ namespace HeightmapCollision
 
         Vector3 movement;
 
+        bool hasJumped;
+        float jumpHeight;
+
         public int currentLevel;
         static public int numLevels = 3;
 
@@ -154,6 +157,7 @@ namespace HeightmapCollision
             input = new InputHandler(graphics);
             Content.RootDirectory = "Content";
             gravity = false;
+            hasJumped = false;
             currentLevel = 0;
         }
 
@@ -214,7 +218,7 @@ namespace HeightmapCollision
         {
             string levelName = "level_";
             levelName += Convert.ToString(currentLevel + 1);
-            terrain = Content.Load<Model>(levelName);
+            terrain = Content.Load<Model>("level_3");
             spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
             // The terrain processor attached a HeightMapInfo to the terrain model's
             // Tag. We'll save that to a member variable now, and use it to
@@ -565,9 +569,19 @@ namespace HeightmapCollision
             // go. If that value is on the heightmap, we'll allow the move.
             Vector3 newSpherePosition = spherePosition + velocity;
 
+
+
             Vector3 oldNormal;
             Vector3 newNormal;
             heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
+
+            if (input.jumped() && !hasJumped && !gravity)
+            {
+                hasJumped = true;
+                jumpHeight = spherePosition.Y + SphereRadius * 4;
+            }
+            
+            
             if (gravity)
             {
                 if ((spherePosition.Y - gravityConst) > (newHeight + SphereRadius))
@@ -579,6 +593,19 @@ namespace HeightmapCollision
                     spherePosition.Y = newHeight + SphereRadius;
                     gravity = false;
                     movement.Y = 0;
+                }
+            }
+
+            if (hasJumped)
+            {
+                if (spherePosition.Y < jumpHeight)
+                {
+                    newSpherePosition.Y += 3;
+                }
+                else
+                {
+                    gravity = true;
+                    hasJumped = false;
                 }
             }
 
@@ -594,7 +621,7 @@ namespace HeightmapCollision
                 heightMapInfo.GetHeightAndNormal(spherePosition, out oldHeight, out oldNormal);
                 heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
                 
-                if (!gravity)
+                if (!gravity && !hasJumped)
                 {
                     newSpherePosition.Y = oldHeight + SphereRadius;
                 }
@@ -627,10 +654,13 @@ namespace HeightmapCollision
                         else
                         {
                            // Console.WriteLine("I am here: {0}", Math.Acos(Vector3.Dot(newNormal, Vector3.Up)));
-                            gravity = true;
+                            if (!hasJumped)
+                            {
+                                gravity = true;
+                            }
                         }
                     }
-                    result.Y = oldHeight + SphereRadius;
+                    result.Y = spherePosition.Y + SphereRadius;
                     result.X = newSpherePosition.X - spherePosition.X;
                     result.Z = newSpherePosition.Z - spherePosition.Z;
 
@@ -641,7 +671,14 @@ namespace HeightmapCollision
                     if (heightMapInfo.IsOnHeightmap(checkSpherePosition))
                     {
                         heightMapInfo.GetHeightAndNormal(checkSpherePosition, out newHeight, out newNormal);
-                        if (newHeight > oldHeight)
+                        if (gravity)
+                        {
+                            if (newHeight > spherePosition.Y)
+                            {
+                                radiusCheck = true;
+                            }
+                        }
+                        else if (newHeight > oldHeight)
                         {
                             radiusCheck = true;
                         }
