@@ -40,7 +40,7 @@ namespace HeightmapCollision
 
     public enum GameState
     {
-        MAINMENU, INGAME, NOCHANGE, EXIT, INGAME2P, FINISH
+        MAINMENU, INGAME, NOCHANGE, EXIT, INGAME2P, SELECTPLAYERS, FINISH
     };
 
     public class HeightmapCollisionGame : Microsoft.Xna.Framework.Game
@@ -75,8 +75,17 @@ namespace HeightmapCollision
 
         #region Fields
 
+        //main menu buttons
         Button startButton;
         Button exitButton;
+        
+        Rectangle startPos;
+        Rectangle exitPos;
+
+        //selectplayers buttons
+        Button onePlayerButton;
+        Button twoPlayerButton;
+        Button cancelButton;
 
         Texture2D cursor;
         Vector2 cursorPos;
@@ -86,8 +95,7 @@ namespace HeightmapCollision
 
         SpriteBatch spriteBatch;
 
-        Rectangle startPos;
-        Rectangle exitPos;
+        
 
         GraphicsDeviceManager graphics;
         Viewport leftViewport;
@@ -223,16 +231,25 @@ namespace HeightmapCollision
             
             sphere = Content.Load<Model>("sphere");
 
+            cursor = Content.Load<Texture2D>("Cursor");
+            hand = Content.Load<Texture2D>("Cursor");
+
+            //mainmenubuttons
             startPos = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("PlayButton").Width / 2, GraphicsDevice.Viewport.Height / 4 - Content.Load<Texture2D>("PlayButtonHi").Height/2,
                 Content.Load<Texture2D>("PlayButton").Width, Content.Load<Texture2D>("PlayButtonHi").Height);
             exitPos = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("ExitButton").Width / 2, 2*GraphicsDevice.Viewport.Height / 3 - Content.Load<Texture2D>("ExitButtonHi").Height / 2,
                 Content.Load<Texture2D>("ExitButton").Width, Content.Load<Texture2D>("ExitButtonHi").Height);
 
-            cursor = Content.Load<Texture2D>("Cursor");
-            hand = Content.Load<Texture2D>("Cursor");
-
             exitButton = new Button(exitPos, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.EXIT);
-            startButton = new Button(startPos, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.INGAME);
+            startButton = new Button(startPos, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.SELECTPLAYERS);
+
+            //selectPlayers buttons
+            Rectangle position = new Rectangle(0, 0, 400, 200);
+            onePlayerButton = new Button(position, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("ExitButton"), GameState.INGAME);
+            position = new Rectangle(0,200,400,200);
+            twoPlayerButton = new Button(position, Content.Load<Texture2D>("PlayButtonHi"), Content.Load<Texture2D>("ExitButton"), GameState.INGAME2P);
+            position = new Rectangle(0,400,400,200);
+            cancelButton = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.MAINMENU);
         }
 
 
@@ -257,6 +274,9 @@ namespace HeightmapCollision
                 case GameState.MAINMENU:
                     UpdateMainMenu(gameTime);
                     break;
+                case GameState.SELECTPLAYERS:
+                    UpdatePlayerSelect(gameTime);
+                    break;
                 case GameState.EXIT:
                     this.Exit();
                     break;
@@ -266,6 +286,53 @@ namespace HeightmapCollision
             }
 
             base.Update(gameTime);
+        }
+
+        private void UpdatePlayerSelect(GameTime gameTime)
+        {
+            GameState buttonState;
+
+            buttonState = onePlayerButton.Update(gameTime, input.getMouse(), input.getHandPosition(PlayerIndex.One));
+
+            if (buttonState != GameState.NOCHANGE)
+            {
+                currentState = buttonState;
+                if (currentState == GameState.INGAME)
+                {
+                    graphics.GraphicsDevice.BlendState = BlendState.Opaque;
+                    graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                    graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
+                    spherePosition = Vector3.Zero;
+                }
+                return;
+            }
+
+            buttonState = twoPlayerButton.Update(gameTime, input.getMouse(), input.getHandPosition(PlayerIndex.One));
+
+            if (buttonState != GameState.NOCHANGE)
+            {
+                currentState = buttonState;
+                if (currentState == GameState.INGAME2P)
+                {
+                    graphics.GraphicsDevice.BlendState = BlendState.Opaque;
+                    graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                    graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
+                    spherePosition = Vector3.Zero;
+                }
+                return;
+            }
+
+
+            buttonState = cancelButton.Update(gameTime, input.getMouse(), input.getHandPosition(PlayerIndex.One));
+
+            if (buttonState != GameState.NOCHANGE)
+            {
+                currentState = buttonState;
+                return;
+            }
+
+            cursorPos = new Vector2(input.getMouse().X, input.getMouse().Y);
+            handPos = input.getHandPosition(PlayerIndex.One);
         }
 
         private void UpdateMainMenu(GameTime gameTime)
@@ -387,6 +454,15 @@ namespace HeightmapCollision
                     spriteBatch.Begin();
                     startButton.Draw(spriteBatch);
                     exitButton.Draw(spriteBatch);
+                    spriteBatch.Draw(cursor, cursorPos, Color.White);
+                    spriteBatch.Draw(hand, handPos, Color.White);
+                    spriteBatch.End();
+                    break;
+                case GameState.SELECTPLAYERS:
+                    spriteBatch.Begin();
+                    onePlayerButton.Draw(spriteBatch);
+                    twoPlayerButton.Draw(spriteBatch);
+                    cancelButton.Draw(spriteBatch);
                     spriteBatch.Draw(cursor, cursorPos, Color.White);
                     spriteBatch.Draw(hand, handPos, Color.White);
                     spriteBatch.End();
