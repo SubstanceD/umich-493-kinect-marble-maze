@@ -223,7 +223,7 @@ namespace HeightmapCollision
         {
             string levelName = "level_";
             levelName += Convert.ToString(currentLevel + 1);
-            terrain = Content.Load<Model>("level_3");
+            terrain = Content.Load<Model>(levelName);
             spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
             // The terrain processor attached a HeightMapInfo to the terrain model's
             // Tag. We'll save that to a member variable now, and use it to
@@ -599,7 +599,7 @@ namespace HeightmapCollision
                 }
                 else
                 {
-                    spherePosition.Y = newHeight + SphereRadius;
+                    newSpherePosition.Y = newHeight + SphereRadius;
                     gravity = false;
                     movement.Y = 0;
                 }
@@ -640,11 +640,15 @@ namespace HeightmapCollision
                     if ((Math.Acos(Vector3.Dot(newNormal, Vector3.Up))) < .4)
                     {
                         //Console.WriteLine("I am here: {0}", Math.Acos(Vector3.Dot(newNormal, Vector3.Up)));
+                        if (hasJumped)
+                        {
+                            newSpherePosition.Y = newHeight + SphereRadius + 3;
+                        }
                     }
                     else
                     {
                         //Console.WriteLine("I am not going up a wall ever!");
-                        if (!gravity)
+                        if (!gravity && !hasJumped)
                         {
                             newSpherePosition = spherePosition;
                         }
