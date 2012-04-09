@@ -104,7 +104,9 @@ namespace HeightmapCollision
         Model terrain;
 
         Matrix projectionMatrix;
-        Matrix viewMatrix;
+        Matrix p1View;
+        Matrix p2View;
+
         Matrix p1Projection;
         Matrix p2Projection;
 
@@ -187,25 +189,28 @@ namespace HeightmapCollision
             // now that the GraphicsDevice has been created, we can create the projection matrix.
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.ToRadians(45.0f), GraphicsDevice.Viewport.AspectRatio, 1f, 10000);
-            p1Projection = Matrix.CreatePerspectiveFieldOfView(
-                MathHelper.ToRadians(45.0f), leftViewport.AspectRatio, 1f, 10000);
-            p2Projection = Matrix.CreatePerspectiveFieldOfView(
-                MathHelper.ToRadians(45.0f), rightViewport.AspectRatio, 1f, 10000);
+           
 
             currentState = GameState.MAINMENU;
 
             Viewport original = graphics.GraphicsDevice.Viewport;
 
-            leftViewport = new Viewport();
-            leftViewport.X = original.X;
-            leftViewport.Y = original.Y;
-            leftViewport.Width = original.Width / 2;
-            leftViewport.Height = original.Height;
+            leftViewport = new Viewport(new Rectangle(original.X, original.Y,original.Width / 2, original.Height));
+            //leftViewport.X = original.X;
+            //leftViewport.Y = original.Y;
+            //leftViewport.Width = original.Width / 2;
+            //leftViewport.Height = original.Height;
 
-            rightViewport.X = original.X + leftViewport.Width;
-            rightViewport.Y = original.Y;
-            rightViewport.Width = original.Width / 2;
-            rightViewport.Height = original.Height;
+            rightViewport = new Viewport(new Rectangle(original.X + leftViewport.Width, original.Y, original.Width / 2, original.Height));
+            //rightViewport.X = original.X + leftViewport.Width;
+            //rightViewport.Y = original.Y;
+            //rightViewport.Width = original.Width / 2;
+            //rightViewport.Height = original.Height;
+
+            p1Projection = Matrix.CreatePerspectiveFieldOfView(
+               MathHelper.ToRadians(45.0f), rightViewport.AspectRatio, 1f, 10000);
+            p2Projection = Matrix.CreatePerspectiveFieldOfView(
+                MathHelper.ToRadians(45.0f), leftViewport.AspectRatio, 1f, 10000);
 
             base.Initialize();
         }
@@ -272,6 +277,10 @@ namespace HeightmapCollision
             switch (currentState)
             {
                 case GameState.INGAME:
+                    HandleInput();
+                    UpdateCamera();
+                    break;
+                case GameState.INGAME2P:
                     HandleInput();
                     UpdateCamera();
                     break;
@@ -413,7 +422,7 @@ namespace HeightmapCollision
 
 
             // with those values, we'll calculate the viewMatrix.
-            viewMatrix = Matrix.CreateLookAt(cameraPosition,
+            p1View = Matrix.CreateLookAt(cameraPosition,
                                               cameraTarget,
                                               Vector3.Up);
         }
@@ -431,23 +440,23 @@ namespace HeightmapCollision
             switch (currentState)
             {
                 case GameState.INGAME:
-                    DrawModel(terrain, Matrix.Identity);
+                    DrawModel(terrain, Matrix.Identity, p1View, projectionMatrix);
                     DrawModel(sphere, sphereRollingMatrix * 
-                        Matrix.CreateTranslation(spherePosition));
+                        Matrix.CreateTranslation(spherePosition), p1View, projectionMatrix);
                     isOnFinish(spherePosition);
                     break;
                 case GameState.INGAME2P:
                     Viewport original = graphics.GraphicsDevice.Viewport;
 
-                    graphics.GraphicsDevice.Viewport = leftViewport;
-                    DrawModel(terrain, Matrix.Identity);
-                    DrawModel(sphere, sphereRollingMatrix *
-                        Matrix.CreateTranslation(spherePosition));
-                    
                     graphics.GraphicsDevice.Viewport = rightViewport;
-                    DrawModel(terrain, Matrix.Identity);
+                    DrawModel(terrain, Matrix.Identity, p1View, p1Projection);
                     DrawModel(sphere, sphereRollingMatrix *
-                        Matrix.CreateTranslation(spherePosition));
+                        Matrix.CreateTranslation(spherePosition), p1View, p1Projection);
+                    
+                    graphics.GraphicsDevice.Viewport = leftViewport;
+                    DrawModel(terrain, Matrix.Identity, p2View, p2Projection);
+                    DrawModel(sphere, sphereRollingMatrix *
+                        Matrix.CreateTranslation(spherePosition), p2View, p2Projection);
 
                     graphics.GraphicsDevice.Viewport = original;
                     
@@ -488,7 +497,7 @@ namespace HeightmapCollision
         /// <summary>
         /// Helper for drawing the terrain model.
         /// </summary>
-        void DrawModel(Model model, Matrix worldMatrix)
+        void DrawModel(Model model, Matrix worldMatrix, Matrix view, Matrix projection)
         {
             Matrix[] boneTransforms = new Matrix[model.Bones.Count];
             model.CopyAbsoluteBoneTransformsTo(boneTransforms);
@@ -498,8 +507,8 @@ namespace HeightmapCollision
                 foreach (BasicEffect effect in mesh.Effects)
                 {
                     effect.World = boneTransforms[mesh.ParentBone.Index] * worldMatrix;
-                    effect.View = viewMatrix;
-                    effect.Projection = projectionMatrix;
+                    effect.View = view;
+                    effect.Projection = projection;
 
                     effect.EnableDefaultLighting();
                     effect.PreferPerPixelLighting = true;
