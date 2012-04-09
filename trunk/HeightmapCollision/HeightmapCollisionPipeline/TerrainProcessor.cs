@@ -9,11 +9,14 @@
 
 #region Using Statements
 using System.ComponentModel;
+using System;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
 #endregion
 
 namespace HeightmapCollisionPipeline
@@ -23,6 +26,23 @@ namespace HeightmapCollisionPipeline
     /// input heightfield texture, this processor uses the MeshBuilder
     /// class to programatically generate terrain geometry.
     /// </summary>
+
+
+    public struct finishValues
+    {
+        public int xMin;
+        public int XMax;
+        public int yMin;
+        public int yMax;
+
+        public finishValues(int p, int p_2, int p_3, int p_4)
+        {
+            xMin = p;
+            XMax = p_2;
+            yMin = p_3;
+            yMax = p_4;
+        }
+    }
     [ContentProcessor]
     public class TerrainProcessor : ContentProcessor<Texture2DContent, ModelContent>
     {
@@ -68,6 +88,16 @@ namespace HeightmapCollisionPipeline
             get { return terrainTextureFilename; }
             set { terrainTextureFilename = value; }
         }
+
+        //create levels and level array
+
+        public int currentLevel = 0;
+
+        public static finishValues[] levelValues = new finishValues[]
+        {
+            new finishValues(210, 220, 210, 220), //Level One
+            new finishValues(25, 35, 210, 220), // Level Two
+        };
 
 
         #endregion
@@ -123,11 +153,22 @@ namespace HeightmapCollisionPipeline
             int texCoordId = builder.CreateVertexChannel<Vector2>(
                                             VertexChannelNames.TextureCoordinate(0));
 
+            string fileName = input.Identity.SourceFilename;
+            int numLevel =  0;
+            if (fileName.Contains("level_2"))
+            {
+                numLevel = 1;
+            }
+           //  string[] tempFile = fileName.Split('_');
+           //  fileName = tempFile[1];
+           // int numLevel = Convert.ToInt32(fileName[0]) - 1;
             int xMin, xMax, yMin, yMax;
-            xMin = 210;
-            xMax = 220;
-            yMin = 210;
-            yMax = 220;
+            xMin = levelValues[numLevel].xMin;
+            xMax = levelValues[numLevel].XMax;
+            yMin = levelValues[numLevel].yMin;
+            yMax = levelValues[numLevel].yMax;
+
+            currentLevel++;
 
             // Create the individual triangles that make up our terrain.
             for (int y = 0; y < heightfield.Height - 1; y++)
@@ -135,7 +176,6 @@ namespace HeightmapCollisionPipeline
                 for (int x = 0; x < heightfield.Width - 1; x++)
                 {
                     if ((x >= xMin) && (x <= xMax) && (y >= yMin) && (y <= yMax))
-                    //if (x > 128)
                     {
                         builder.SetMaterial(finishMaterial);
                     }
