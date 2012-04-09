@@ -38,7 +38,6 @@ namespace HeightmapCollision
         }
     }
 
-
     public enum GameState
     {
         MAINMENU, INGAME, NOCHANGE, EXIT, INGAME2P, FINISH
@@ -118,11 +117,13 @@ namespace HeightmapCollision
         Vector3 movement;
 
         public int currentLevel;
+        static public int numLevels = 2;
 
         public static finishValues[] levelValues = new finishValues[]
         {
-            new finishValues(210*12, 220*12, 210*12, 220*12), //Level One
-            //The twelve is a size that I can't figure out
+            new finishValues(2500, 2800, 2500, 2800), //Level One
+            new finishValues(-3150, -2850, 2500, 2800), // Level Two
+            //This is the sphere position approximated
         };
 
         #endregion
@@ -143,13 +144,18 @@ namespace HeightmapCollision
 
         bool isOnFinish(Vector3 s)
         {
-            Console.WriteLine("X: {0} Z: {1}", s.X, s.Z);
+           // Console.WriteLine("X: {0} Z: {1}", spherePosition.X, spherePosition.Z);
             if ((s.X <= levelValues[currentLevel].xMax) &&
                 (s.X >= levelValues[currentLevel].xMin) &&
                 (s.Z <= levelValues[currentLevel].yMax) &&
                 (s.Z >= levelValues[currentLevel].yMin))
             {
                 currentState = GameState.MAINMENU; //For testing
+                if (currentLevel < (numLevels-1))
+                {
+                    ++currentLevel;
+                    LoadContent();
+                }
                 //currentState = GameState.FINISH
                 return true;
                 
@@ -187,7 +193,9 @@ namespace HeightmapCollision
         /// </summary>
         protected override void LoadContent()
         {
-            terrain = Content.Load<Model>("level_1");
+            string levelName = "level_";
+            levelName += Convert.ToString(currentLevel + 1);
+            terrain = Content.Load<Model>(levelName);
             spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
             // The terrain processor attached a HeightMapInfo to the terrain model's
             // Tag. We'll save that to a member variable now, and use it to
@@ -261,6 +269,10 @@ namespace HeightmapCollision
                 graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
                 graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
                 currentState = buttonState;
+                if (currentState == GameState.INGAME)
+                {
+                    spherePosition = Vector3.Zero;
+                }
                 return;
             }
 
@@ -429,6 +441,11 @@ namespace HeightmapCollision
             {
                 spherePosition = Vector3.Zero;
                 currentState = GameState.MAINMENU;
+            }
+
+            if (input.reset())
+            {
+                spherePosition = Vector3.Zero;
             }
 
             // Now move the sphere. First, we want to check to see if the sphere should
