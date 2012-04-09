@@ -106,16 +106,6 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="OnePlayer.png">
-      <Name>OnePlayer</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="OnePlayerHi.png">
-      <Name>OnePlayerHi</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
     <Compile Include="PlayButton.png">
       <Name>PlayButton</Name>
       <Importer>TextureImporter</Importer>
@@ -123,16 +113,6 @@
     </Compile>
     <Compile Include="PlayButtonHi.png">
       <Name>PlayButtonHi</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="TwoPlayer.png">
-      <Name>TwoPlayer</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="TwoPlayerHi.png">
-      <Name>TwoPlayerHi</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -145,6 +125,30 @@
     </Compile>
     <Compile Include="MainMenuHi.png">
       <Name>MainMenuHi</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="TwoPlayer.png">
+      <Name>TwoPlayer</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="OnePlayer.png">
+      <Name>OnePlayer</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="OnePlayerHi.png">
+      <Name>OnePlayerHi</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="TwoPlayerHi.png">
+      <Name>TwoPlayerHi</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
