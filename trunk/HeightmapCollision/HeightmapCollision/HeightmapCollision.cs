@@ -245,11 +245,11 @@ namespace HeightmapCollision
 
             //selectPlayers buttons
             Rectangle position = new Rectangle(0, 0, 400, 200);
-            onePlayerButton = new Button(position, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("ExitButton"), GameState.INGAME);
+            onePlayerButton = new Button(position, Content.Load<Texture2D>("OnePlayer"), Content.Load<Texture2D>("OnePlayerHi"), GameState.INGAME);
             position = new Rectangle(0,200,400,200);
-            twoPlayerButton = new Button(position, Content.Load<Texture2D>("PlayButtonHi"), Content.Load<Texture2D>("ExitButton"), GameState.INGAME2P);
+            twoPlayerButton = new Button(position, Content.Load<Texture2D>("TwoPlayer"), Content.Load<Texture2D>("TwoPlayerHi"), GameState.INGAME2P);
             position = new Rectangle(0,400,400,200);
-            cancelButton = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.MAINMENU);
+            cancelButton = new Button(position, Content.Load<Texture2D>("MainMenu"), Content.Load<Texture2D>("MainMenuHi"), GameState.MAINMENU);
         }
 
 
