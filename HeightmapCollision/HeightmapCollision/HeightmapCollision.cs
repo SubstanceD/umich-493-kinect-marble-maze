@@ -97,9 +97,15 @@ namespace HeightmapCollision
 
         Matrix projectionMatrix;
         Matrix viewMatrix;
+        Matrix p1Projection;
+        Matrix p2Projection;
 
         Vector3 spherePosition;
+        Vector3 p1Position;
+        Vector3 p2Position;
         float sphereFacingDirection;
+        float p1Facing;
+        float p2Facing;
         Matrix sphereRollingMatrix = Matrix.Identity;
 
         Model sphere;
@@ -169,6 +175,10 @@ namespace HeightmapCollision
             // now that the GraphicsDevice has been created, we can create the projection matrix.
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.ToRadians(45.0f), GraphicsDevice.Viewport.AspectRatio, 1f, 10000);
+            p1Projection = Matrix.CreatePerspectiveFieldOfView(
+                MathHelper.ToRadians(45.0f), leftViewport.AspectRatio, 1f, 10000);
+            p2Projection = Matrix.CreatePerspectiveFieldOfView(
+                MathHelper.ToRadians(45.0f), rightViewport.AspectRatio, 1f, 10000);
 
             currentState = GameState.MAINMENU;
 
@@ -441,12 +451,14 @@ namespace HeightmapCollision
             if (input.exit())
             {
                 spherePosition = Vector3.Zero;
+                sphereFacingDirection = 0;
                 currentState = GameState.MAINMENU;
             }
 
             if (input.reset())
             {
                 spherePosition = Vector3.Zero;
+                sphereFacingDirection = 0;
             }
 
             // Now move the sphere. First, we want to check to see if the sphere should
