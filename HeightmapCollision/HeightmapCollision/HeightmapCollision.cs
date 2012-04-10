@@ -136,13 +136,14 @@ namespace HeightmapCollision
         float jumpHeight;
 
         public int currentLevel;
-        static public int numLevels = 3;
+        static public int numLevels = 4;
 
         public static finishValues[] levelValues = new finishValues[]
         {
             new finishValues(2500, 2800, 2500, 2800), //Level One
             new finishValues(-3150, -2850, 2500, 2800), // Level Two
             new finishValues(2600, 2750, 2600, 2750), //Level Three
+            new finishValues(-3220,-2601,-3812,-3193) // Level Four
             //This is the sphere position approximated
         };
 
@@ -165,7 +166,7 @@ namespace HeightmapCollision
 
         bool isOnFinish(Vector3 s)
         {
-           // Console.WriteLine("X: {0} Z: {1}", spherePosition.X, spherePosition.Z);
+            Console.WriteLine("X: {0} Z: {1}", spherePosition.X, spherePosition.Z);
             if ((s.X <= levelValues[currentLevel].xMax) &&
                 (s.X >= levelValues[currentLevel].xMin) &&
                 (s.Z <= levelValues[currentLevel].yMax) &&
@@ -223,6 +224,12 @@ namespace HeightmapCollision
         {
             string levelName = "level_";
             levelName += Convert.ToString(currentLevel + 1);
+
+            if (levelName == "level_4")
+                spherePosition = new Vector3(-3377, 0, 3647);
+            else
+                spherePosition = Vector3.Zero;
+            currentLevel = 3;
             terrain = Content.Load<Model>(levelName);
             spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
             // The terrain processor attached a HeightMapInfo to the terrain model's
@@ -295,12 +302,20 @@ namespace HeightmapCollision
                 case GameState.EXIT:
                     this.Exit();
                     break;
+                case GameState.FINISH:
+                    UpdateFinishGame(gameTime);
+                    break;
                 default:
                     //error message here
                     break;
             }
 
             base.Update(gameTime);
+        }
+
+        private void UpdateFinishGame(GameTime gameTime)
+        {
+            
         }
 
         private void UpdatePlayerSelect(GameTime gameTime)
@@ -317,7 +332,6 @@ namespace HeightmapCollision
                     graphics.GraphicsDevice.BlendState = BlendState.Opaque;
                     graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
                     graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
-                    spherePosition = Vector3.Zero;
                 }
                 return;
             }
