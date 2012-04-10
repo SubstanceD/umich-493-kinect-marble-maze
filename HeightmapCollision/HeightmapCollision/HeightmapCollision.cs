@@ -277,12 +277,14 @@ namespace HeightmapCollision
             switch (currentState)
             {
                 case GameState.INGAME:
-                    HandleInput();
-                    UpdateCamera();
+                    HandleInput(PlayerIndex.One);
+                    UpdateCamera(PlayerIndex.One);
                     break;
                 case GameState.INGAME2P:
-                    HandleInput();
-                    UpdateCamera();
+                    HandleInput(PlayerIndex.One);
+                    UpdateCamera(PlayerIndex.One);
+                    HandleInput(PlayerIndex.Two);
+                    UpdateCamera(PlayerIndex.Two);
                     break;
                 case GameState.MAINMENU:
                     UpdateMainMenu(gameTime);
@@ -383,7 +385,7 @@ namespace HeightmapCollision
         /// this function will calculate the camera's position and the position of 
         /// its target. From those, we'll update the viewMatrix.
         /// </summary>
-        private void UpdateCamera()
+        private void UpdateCamera(PlayerIndex player)
         {
             // The camera's position depends on the sphere's facing direction: when the
             // sphere turns, the camera needs to stay behind it. So, we'll calculate a
@@ -422,9 +424,12 @@ namespace HeightmapCollision
 
 
             // with those values, we'll calculate the viewMatrix.
-            p1View = Matrix.CreateLookAt(cameraPosition,
+            if (player == PlayerIndex.One)
+                p1View = Matrix.CreateLookAt(cameraPosition,
                                               cameraTarget,
                                               Vector3.Up);
+            else if (player == PlayerIndex.Two)
+                p2View = Matrix.CreateLookAt(cameraPosition, cameraTarget, Vector3.Up);
         }
 
 
@@ -442,21 +447,21 @@ namespace HeightmapCollision
                 case GameState.INGAME:
                     DrawModel(terrain, Matrix.Identity, p1View, projectionMatrix);
                     DrawModel(sphere, sphereRollingMatrix * 
-                        Matrix.CreateTranslation(spherePosition), p1View, projectionMatrix);
-                    isOnFinish(spherePosition);
+                        Matrix.CreateTranslation(p1Position), p1View, projectionMatrix);
+                    isOnFinish(p1Position);
                     break;
                 case GameState.INGAME2P:
                     Viewport original = graphics.GraphicsDevice.Viewport;
-
+                    //player one
                     graphics.GraphicsDevice.Viewport = rightViewport;
                     DrawModel(terrain, Matrix.Identity, p1View, p1Projection);
                     DrawModel(sphere, sphereRollingMatrix *
-                        Matrix.CreateTranslation(spherePosition), p1View, p1Projection);
-                    
+                        Matrix.CreateTranslation(p1Position), p1View, p1Projection);
+                    //player two
                     graphics.GraphicsDevice.Viewport = leftViewport;
                     DrawModel(terrain, Matrix.Identity, p2View, p2Projection);
                     DrawModel(sphere, sphereRollingMatrix *
-                        Matrix.CreateTranslation(spherePosition), p2View, p2Projection);
+                        Matrix.CreateTranslation(p2Position), p2View, p2Projection);
 
                     graphics.GraphicsDevice.Viewport = original;
                     
@@ -534,35 +539,32 @@ namespace HeightmapCollision
         /// <summary>
         /// Handles input for quitting the game.
         /// </summary>
-        private void HandleInput()
+        private void HandleInput(PlayerIndex player)
         {
-            // Check for exit.
-            if (input.exit())
+            if (player == PlayerIndex.One)
             {
-                spherePosition = Vector3.Zero;
-                sphereFacingDirection = 0;
-                currentState = GameState.MAINMENU;
+                spherePosition = p1Position;
+                sphereFacingDirection = p1Facing;
             }
-
-            if (input.reset())
+            else if (player == PlayerIndex.Two)
             {
-                spherePosition = Vector3.Zero;
-                sphereFacingDirection = 0;
+                spherePosition = p2Position;
+                sphereFacingDirection = p2Facing;
             }
 
             // Now move the sphere. First, we want to check to see if the sphere should
             // turn. turnAmount will be an accumulation of all the different possible
             // inputs.
 
-            sphereFacingDirection += input.turnAmount(PlayerIndex.One) *SphereTurnSpeed;
+            sphereFacingDirection += input.turnAmount(player) *SphereTurnSpeed;
 
 
             // Next, we want to move the sphere forward or back. to do this, 
             // we'll create a Vector3 and modify use the user's input to modify the Z
             // component, which corresponds to the forward direction.
             
-            movement.Z = input.moveAmount(PlayerIndex.One);
-            movement.X = input.strafeAmount(PlayerIndex.One);
+            movement.Z = input.moveAmount(player);
+            movement.X = input.strafeAmount(player);
 
 
             // next, we'll create a rotation matrix from the sphereFacingDirection, and
@@ -738,6 +740,31 @@ namespace HeightmapCollision
             // once we've finished all computations, we can set spherePosition to the
             // new position that we calculated.
             spherePosition = newSpherePosition;
+
+            // Check for exit.
+            if (input.exit())
+            {
+                spherePosition = Vector3.Zero;
+                sphereFacingDirection = 0;
+                currentState = GameState.MAINMENU;
+            }
+
+            if (input.reset())
+            {
+                spherePosition = Vector3.Zero;
+                sphereFacingDirection = 0;
+            }
+
+            if (player == PlayerIndex.One)
+            {
+                p1Position = spherePosition;
+                p1Facing = sphereFacingDirection;
+            }
+            else if (player == PlayerIndex.Two)
+            {
+                p2Position = spherePosition;
+                p2Facing = sphereFacingDirection;
+            }
         }
 
         #endregion
