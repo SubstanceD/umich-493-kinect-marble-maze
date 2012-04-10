@@ -457,11 +457,16 @@ namespace HeightmapCollision
                     DrawModel(terrain, Matrix.Identity, p1View, p1Projection);
                     DrawModel(sphere, sphereRollingMatrix *
                         Matrix.CreateTranslation(p1Position), p1View, p1Projection);
+                    DrawModel(sphere, sphereRollingMatrix *
+                        Matrix.CreateTranslation(p2Position), p1View, p1Projection);
+                    
                     //player two
                     graphics.GraphicsDevice.Viewport = leftViewport;
                     DrawModel(terrain, Matrix.Identity, p2View, p2Projection);
                     DrawModel(sphere, sphereRollingMatrix *
                         Matrix.CreateTranslation(p2Position), p2View, p2Projection);
+                    DrawModel(sphere, sphereRollingMatrix *
+                        Matrix.CreateTranslation(p1Position), p2View, p2Projection);
 
                     graphics.GraphicsDevice.Viewport = original;
                     
