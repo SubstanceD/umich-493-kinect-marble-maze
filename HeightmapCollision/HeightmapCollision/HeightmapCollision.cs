@@ -172,12 +172,8 @@ namespace HeightmapCollision
                 (s.Z <= levelValues[currentLevel].yMax) &&
                 (s.Z >= levelValues[currentLevel].yMin))
             {
-                currentState = GameState.MAINMENU; //For testing
-                if (currentLevel < (numLevels-1))
-                {
-                    ++currentLevel;
-                    LoadContent();
-                }
+                //currentState = GameState.MAINMENU; //For testing
+                
                 //currentState = GameState.FINISH
                 return true;
                 
@@ -286,12 +282,30 @@ namespace HeightmapCollision
                 case GameState.INGAME:
                     HandleInput(PlayerIndex.One);
                     UpdateCamera(PlayerIndex.One);
+                    if (isOnFinish(p1Position))
+                    {
+                        currentState = GameState.MAINMENU;
+                        if (currentLevel < (numLevels - 1))
+                        {
+                            ++currentLevel;
+                            LoadContent();
+                        }
+                    }
                     break;
                 case GameState.INGAME2P:
                     HandleInput(PlayerIndex.One);
                     UpdateCamera(PlayerIndex.One);
                     HandleInput(PlayerIndex.Two);
                     UpdateCamera(PlayerIndex.Two);
+                    if (isOnFinish(p1Position) && isOnFinish(p2Position))
+                    {
+                        currentState = GameState.MAINMENU;
+                        if (currentLevel < (numLevels - 1))
+                        {
+                            ++currentLevel;
+                            LoadContent();
+                        }
+                    }
                     break;
                 case GameState.MAINMENU:
                     UpdateMainMenu(gameTime);
@@ -462,7 +476,6 @@ namespace HeightmapCollision
                     DrawModel(terrain, Matrix.Identity, p1View, projectionMatrix);
                     DrawModel(sphere, sphereRollingMatrix * 
                         Matrix.CreateTranslation(p1Position), p1View, projectionMatrix);
-                    isOnFinish(p1Position);
                     break;
                 case GameState.INGAME2P:
                     Viewport original = graphics.GraphicsDevice.Viewport;
