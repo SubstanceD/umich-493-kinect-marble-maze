@@ -473,7 +473,6 @@ namespace HeightmapCollision
                         Matrix.CreateTranslation(p1Position), p1View, p1Projection);
                     DrawModel(sphere, sphereRollingMatrix *
                         Matrix.CreateTranslation(p2Position), p1View, p1Projection);
-                    
                     //player two
                     graphics.GraphicsDevice.Viewport = leftViewport;
                     DrawModel(terrain, Matrix.Identity, p2View, p2Projection);
@@ -542,6 +541,7 @@ namespace HeightmapCollision
                     effect.FogColor = Vector3.Zero;
                     effect.FogStart = 1000;
                     effect.FogEnd = 3200;
+
                 }
 
                 mesh.Draw();
@@ -656,6 +656,7 @@ namespace HeightmapCollision
                     newSpherePosition.Y = oldHeight + SphereRadius;
                 }
                 Vector3 checkSpherePosition = newSpherePosition;
+                Vector3 result;
                 if (oldHeight < newHeight) 
                 {
                     if ((Math.Acos(Vector3.Dot(newNormal, Vector3.Up))) < .4)
@@ -673,11 +674,48 @@ namespace HeightmapCollision
                         {
                             newSpherePosition = spherePosition;
                         }
+                        else if (newSpherePosition.Y < newHeight)
+                        {
+                            newSpherePosition = spherePosition;
+                        }
+                    }
+                    result.Y = spherePosition.Y + SphereRadius;
+                    result.X = newSpherePosition.X - spherePosition.X;
+                    result.Z = newSpherePosition.Z - spherePosition.Z;
+
+                    checkSpherePosition.Y = spherePosition.Y;
+                    checkSpherePosition.X += SphereRadius * Math.Sign(result.X);
+                    checkSpherePosition.Z += SphereRadius * Math.Sign(result.Z);
+                    bool radiusCheck = false;
+                    if (heightMapInfo.IsOnHeightmap(checkSpherePosition))
+                    {
+                        heightMapInfo.GetHeightAndNormal(checkSpherePosition, out newHeight, out newNormal);
+                        if (gravity)
+                        {
+                            if (newHeight > spherePosition.Y)
+                            {
+                                radiusCheck = true;
+                            }
+                        }
+                        else if (newHeight > oldHeight)
+                        {
+                            radiusCheck = true;
+                        }
+                    }
+                    else
+                    {
+                        radiusCheck = true;
+                    }
+                    if (radiusCheck)
+                    {
+                       // newSpherePosition.Y = result.Y;
+                        newSpherePosition.X -= SphereRadius * Math.Sign(result.X); ;
+                        newSpherePosition.Z -= SphereRadius * Math.Sign(result.Z); ;
                     }
                 }
                 else //newHeight <= oldHeight
                 {
-                    Vector3 result;
+                    
                     
                     if ((newHeight < oldHeight + SphereRadius) && (newHeight != oldHeight))
                     {
