@@ -683,8 +683,6 @@ namespace HeightmapCollision
 
                 else //newHeight <= oldHeight
                 {
-
-
                     if ((newHeight < oldHeight + SphereRadius) && (newHeight != oldHeight))
                     {
                         if ((Math.Acos(Vector3.Dot(newNormal, Vector3.Up))) < .4)
@@ -729,7 +727,7 @@ namespace HeightmapCollision
                     }
                     if (radiusCheck)
                     {
-                        newSpherePosition.Y = result.Y;
+                        newSpherePosition.Y = spherePosition.Y;
                         newSpherePosition.X -= SphereRadius * Math.Sign(result.X); ;
                         newSpherePosition.Z -= SphereRadius * Math.Sign(result.Z); ;
                     }
