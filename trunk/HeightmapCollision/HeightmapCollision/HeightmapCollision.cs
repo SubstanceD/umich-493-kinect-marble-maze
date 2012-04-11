@@ -28,6 +28,7 @@ namespace HeightmapCollision
         public int xMax;
         public int yMin;
         public int yMax;
+        public Vector3 initialPosition;
 
         public finishValues(int p, int p_2, int p_3, int p_4)
         {
@@ -35,7 +36,17 @@ namespace HeightmapCollision
             xMax = p_2;
             yMin = p_3;
             yMax = p_4;
+            initialPosition = Vector3.Zero;
         }
+        public finishValues(int p, int p_2, int p_3, int p_4, Vector3 initial)
+        {
+            xMin = p;
+            xMax = p_2;
+            yMin = p_3;
+            yMax = p_4;
+            initialPosition = initial;
+        }
+
     }
 
     public enum GameState
@@ -145,7 +156,7 @@ namespace HeightmapCollision
             new finishValues(2500, 2800, 2500, 2800), //Level One
             new finishValues(-3150, -2850, 2500, 2800), // Level Two
             new finishValues(2600, 2750, 2600, 2750), //Level Three
-            new finishValues(-3220,-2601,-3812,-3193) // Level Four
+            new finishValues(-3220,-2601,-3812,-3193, new Vector3(-3377, 0, 3647)) // Level Four
             //This is the sphere position approximated
         };
 
@@ -223,10 +234,7 @@ namespace HeightmapCollision
             string levelName = "level_";
             levelName += Convert.ToString(currentLevel + 1);
 
-            if (levelName == "level_4")
-                spherePosition = new Vector3(-3377, 0, 3647);
-            else
-                spherePosition = Vector3.Zero;
+            spherePosition = levelValues[currentLevel].initialPosition;
 
             flagPosition = Vector3.Zero;
             flagPosition.X = levelValues[currentLevel].xMax;
@@ -796,7 +804,7 @@ namespace HeightmapCollision
 
             if (input.reset())
             {
-                spherePosition = Vector3.Zero;
+                spherePosition = levelValues[currentLevel].initialPosition;
                 sphereFacingDirection = 0;
             }
 
