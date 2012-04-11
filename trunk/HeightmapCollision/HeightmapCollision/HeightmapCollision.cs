@@ -698,24 +698,21 @@ namespace HeightmapCollision
             Matrix sphereFacingMatrix = Matrix.CreateRotationY(sphereFacingDirection);
 
             currentVelocity += Vector3.Transform(movement, sphereFacingMatrix);
-            if (movement == Vector3.Zero)
+            if (Math.Abs(currentVelocity.X) < 0.2f)
             {
-                if (Math.Abs(currentVelocity.X) < 0.2f)
-                {
-                    currentVelocity.X = 0;
-                }
-                else
-                {
-                    currentVelocity.X -= Math.Sign(currentVelocity.X) * FrictionConst;
-                }
-                if (Math.Abs(currentVelocity.Z) < 0.2f)
-                {
-                    currentVelocity.Z = 0;
-                }
-                else
-                {
-                    currentVelocity.Z -= Math.Sign(currentVelocity.Z) * FrictionConst;
-                }
+                currentVelocity.X = 0;
+            }
+            else
+            {
+                currentVelocity.X -= Math.Sign(currentVelocity.X) * FrictionConst;
+            }
+            if (Math.Abs(currentVelocity.Z) < 0.2f)
+            {
+                currentVelocity.Z = 0;
+            }
+            else
+            {
+                currentVelocity.Z -= Math.Sign(currentVelocity.Z) * FrictionConst;
             }
 
             if (currentVelocity.X < -MaxVelocity)
