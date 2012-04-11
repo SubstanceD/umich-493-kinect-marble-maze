@@ -59,7 +59,7 @@ namespace HeightmapCollision
         #region Constants
 
         // This constant controls how quickly the sphere can move forward and backward
-        const float MaxVelocity = 20;
+        const float SphereVelocity = 20;
 
         // how quickly the sphere can turn from side to side
         const float SphereTurnSpeed = .025f;
@@ -68,13 +68,8 @@ namespace HeightmapCollision
         // and when computing how far the sphere has rolled.
         const float SphereRadius = 12.0f;
 
-        const float FrictionConst = .4f;
-
         //value used for falling ball
-        const float gravityConst = 2.0f;
-
-        // Used for jumping
-        const float jumpConst = .2f;
+        const float gravityConst = .2f;
 
         // This vector controls how much the camera's position is offset from the
         // sphere. This value can be changed to move the camera further away from or
@@ -84,6 +79,8 @@ namespace HeightmapCollision
         // This value controls the point the camera will aim at. This value is an offset
         // from the sphere's position.
         readonly Vector3 CameraTargetOffset = new Vector3(0, 30, 0);
+
+
 
         #endregion
 
@@ -107,7 +104,9 @@ namespace HeightmapCollision
         Texture2D hand;
         Vector2 handPos;
 
-        SpriteBatch spriteBatch;    
+        SpriteBatch spriteBatch;
+
+        
 
         GraphicsDeviceManager graphics;
         Viewport leftViewport;
@@ -130,6 +129,8 @@ namespace HeightmapCollision
         float p1Facing;
         float p2Facing;
         Matrix sphereRollingMatrix = Matrix.Identity;
+        Matrix p1RollingMatrix = Matrix.Identity;
+        Matrix p2RollingMatrix = Matrix.Identity;
 
         Model sphere;
         Model flag;
@@ -141,9 +142,6 @@ namespace HeightmapCollision
 
         float oldHeight;
         float newHeight;
-
-
-        Vector3 currentVelocity;
 
         bool gravity;
 
@@ -160,7 +158,7 @@ namespace HeightmapCollision
             new finishValues(2500, 2800, 2500, 2800), //Level One
             new finishValues(-3150, -2850, 2500, 2800), // Level Two
             new finishValues(2600, 2750, 2600, 2750), //Level Three
-            new finishValues(-3220,-2601,-3812,-3193, new Vector3(-3377, 0, 3647)) // Level Four
+            new finishValues(-3220,-2601,-3812,-3193, new Vector3(-3250, 0, 1875)) // Level Four
             //This is the sphere position approximated
         };
 
@@ -179,7 +177,6 @@ namespace HeightmapCollision
             gravity = false;
             hasJumped = false;
             currentLevel = 0;
-            currentVelocity = Vector3.Zero;
         }
 
         bool isOnFinish(Vector3 s)
@@ -236,29 +233,7 @@ namespace HeightmapCollision
         /// </summary>
         protected override void LoadContent()
         {
-            string levelName = "level_";
-            levelName += Convert.ToString(currentLevel + 1);
-            spherePosition = levelValues[currentLevel].initialPosition;
-            sphereFacingDirection = 0;
-            currentVelocity = Vector3.Zero;          
-
-            flagPosition = Vector3.Zero;
-            flagPosition.X = levelValues[currentLevel].xMax;
-            flagPosition.Z = levelValues[currentLevel].yMax;
-            terrain = Content.Load<Model>(levelName);
             spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
-            // The terrain processor attached a HeightMapInfo to the terrain model's
-            // Tag. We'll save that to a member variable now, and use it to
-            // calculate the terrain's heights later.
-            heightMapInfo = terrain.Tag as HeightMapInfo;
-            
-            if (heightMapInfo == null)
-            {
-                string message = "The terrain model did not have a HeightMapInfo " +
-                    "object attached. Are you sure you are using the " +
-                    "TerrainProcessor?";
-                throw new InvalidOperationException(message);
-            }
             
             sphere = Content.Load<Model>("sphere");
             flag = Content.Load<Model>("flag");
@@ -282,6 +257,34 @@ namespace HeightmapCollision
             twoPlayerButton = new Button(position, Content.Load<Texture2D>("TwoPlayer"), Content.Load<Texture2D>("TwoPlayerHi"), GameState.INGAME2P);
             position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("OnePlayer").Width / 2, 475, 400, 200);
             cancelButton = new Button(position, Content.Load<Texture2D>("MainMenu"), Content.Load<Texture2D>("MainMenuHi"), GameState.MAINMENU);
+
+            loadLevel();
+        }
+
+        private void loadLevel()
+        {
+            string levelName = "level_";
+            levelName += Convert.ToString(currentLevel + 1);
+
+            spherePosition = levelValues[currentLevel].initialPosition;
+
+            flagPosition = Vector3.Zero;
+            flagPosition.X = levelValues[currentLevel].xMax;
+            flagPosition.Z = levelValues[currentLevel].yMax;
+            terrain = Content.Load<Model>(levelName);
+
+            // The terrain processor attached a HeightMapInfo to the terrain model's
+            // Tag. We'll save that to a member variable now, and use it to
+            // calculate the terrain's heights later.
+            heightMapInfo = terrain.Tag as HeightMapInfo;
+
+            if (heightMapInfo == null)
+            {
+                string message = "The terrain model did not have a HeightMapInfo " +
+                    "object attached. Are you sure you are using the " +
+                    "TerrainProcessor?";
+                throw new InvalidOperationException(message);
+            }
         }
 
 
@@ -302,13 +305,20 @@ namespace HeightmapCollision
                 case GameState.INGAME:
                     HandleInput(PlayerIndex.One);
                     UpdateCamera(PlayerIndex.One);
+                    Console.WriteLine("Ball position is: {0}", p1Position.ToString());
                     if (isOnFinish(p1Position))
                     {
                         currentState = GameState.MAINMENU;
+
+                        p1Position = levelValues[currentLevel].initialPosition;
+                        p1Facing = 0;
+                        p2Position = levelValues[currentLevel].initialPosition;
+                        p2Facing = 0;
+
                         if (currentLevel < (numLevels - 1))
                         {
                             ++currentLevel;
-                            LoadContent();
+                            loadLevel();
                         }
                     }
                     break;
@@ -320,10 +330,15 @@ namespace HeightmapCollision
                     if (isOnFinish(p1Position) && isOnFinish(p2Position))
                     {
                         currentState = GameState.MAINMENU;
+                        p1Position = levelValues[currentLevel].initialPosition;
+                        p1Facing = 0;
+                        p2Position = levelValues[currentLevel].initialPosition;
+                        p2Facing = 0;
+
                         if (currentLevel < (numLevels - 1))
                         {
                             ++currentLevel;
-                            LoadContent();
+                            loadLevel();
                         }
                     }
                     break;
@@ -494,26 +509,26 @@ namespace HeightmapCollision
             {
                 case GameState.INGAME:
                     DrawModel(terrain, Matrix.Identity, p1View, projectionMatrix);
-                    DrawModel(sphere, sphereRollingMatrix * 
+                    DrawModel(sphere, p1RollingMatrix * 
                         Matrix.CreateTranslation(p1Position), p1View, projectionMatrix);
                     DrawModel(flag, Matrix.CreateTranslation(flagPosition), p1View, projectionMatrix);
-                    isOnFinish(p1Position);
+                    
                     break;
                 case GameState.INGAME2P:
                     Viewport original = graphics.GraphicsDevice.Viewport;
                     //player one
                     graphics.GraphicsDevice.Viewport = rightViewport;
                     DrawModel(terrain, Matrix.Identity, p1View, p1Projection);
-                    DrawModel(sphere, sphereRollingMatrix *
+                    DrawModel(sphere, p1RollingMatrix *
                         Matrix.CreateTranslation(p1Position), p1View, p1Projection);
-                    DrawModel(sphere, sphereRollingMatrix *
+                    DrawModel(sphere, p2RollingMatrix *
                         Matrix.CreateTranslation(p2Position), p1View, p1Projection);
                     //player two
                     graphics.GraphicsDevice.Viewport = leftViewport;
                     DrawModel(terrain, Matrix.Identity, p2View, p2Projection);
-                    DrawModel(sphere, sphereRollingMatrix *
+                    DrawModel(sphere, p2RollingMatrix *
                         Matrix.CreateTranslation(p2Position), p2View, p2Projection);
-                    DrawModel(sphere, sphereRollingMatrix *
+                    DrawModel(sphere, p1RollingMatrix *
                         Matrix.CreateTranslation(p1Position), p2View, p2Projection);
 
                     graphics.GraphicsDevice.Viewport = original;
@@ -597,11 +612,13 @@ namespace HeightmapCollision
             {
                 spherePosition = p1Position;
                 sphereFacingDirection = p1Facing;
+                sphereRollingMatrix = p1RollingMatrix;
             }
             else if (player == PlayerIndex.Two)
             {
                 spherePosition = p2Position;
                 sphereFacingDirection = p2Facing;
+                sphereRollingMatrix = p2RollingMatrix;
             }
 
             // Now move the sphere. First, we want to check to see if the sphere should
@@ -614,13 +631,25 @@ namespace HeightmapCollision
             // Next, we want to move the sphere forward or back. to do this, 
             // we'll create a Vector3 and modify use the user's input to modify the Z
             // component, which corresponds to the forward direction.
-
-            movement = Vector3.Zero;
-
+            
             movement.Z = input.moveAmount(player);
             movement.X = input.strafeAmount(player);
 
-            Vector3 newSpherePosition = spherePosition + currentVelocity;
+
+            // next, we'll create a rotation matrix from the sphereFacingDirection, and
+            // use it to transform the vector. If we didn't do this, pressing "up" would
+            // always move the ball along +Z. By transforming it, we can move in the
+            // direction the sphere is "facing."
+            Matrix sphereFacingMatrix = Matrix.CreateRotationY(sphereFacingDirection);
+            Vector3 velocity = Vector3.Transform(movement, sphereFacingMatrix);
+            velocity *= SphereVelocity;
+
+            // Now we know how much the user wants to move. We'll construct a temporary
+            // vector, newSpherePosition, which will represent where the user wants to
+            // go. If that value is on the heightmap, we'll allow the move.
+            Vector3 newSpherePosition = spherePosition + velocity;
+
+
 
             Vector3 oldNormal;
             Vector3 newNormal;
@@ -632,13 +661,13 @@ namespace HeightmapCollision
             if (input.jumped() && !hasJumped && !gravity)
             {
                 hasJumped = true;
-                jumpHeight = spherePosition.Y + SphereRadius * 2;
+                jumpHeight = spherePosition.Y + SphereRadius * 4;
             }
-
-
+            
+            
             if (gravity)
             {
-                if ((spherePosition.Y - movement.Y) > (newHeight + SphereRadius))
+                if ((spherePosition.Y - gravityConst) > (newHeight + SphereRadius))
                 {
                     movement.Y -= gravityConst;
                 }
@@ -646,7 +675,6 @@ namespace HeightmapCollision
                 {
                     newSpherePosition.Y = newHeight + SphereRadius;
                     gravity = false;
-                    currentVelocity.Y = 0;
                     movement.Y = 0;
                 }
             }
@@ -655,53 +683,14 @@ namespace HeightmapCollision
             {
                 if (spherePosition.Y < jumpHeight)
                 {
-                    movement.Y = jumpConst;
+                    newSpherePosition.Y += 3;
                 }
                 else
                 {
                     gravity = true;
                     hasJumped = false;
-                    movement.Y = 0;
                 }
             }
-
-            // next, we'll create a rotation matrix from the sphereFacingDirection, and
-            // use it to transform the vector. If we didn't do this, pressing "up" would
-            // always move the ball along +Z. By transforming it, we can move in the
-            // direction the sphere is "facing."
-            Matrix sphereFacingMatrix = Matrix.CreateRotationY(sphereFacingDirection);
-
-            currentVelocity += Vector3.Transform(movement, sphereFacingMatrix);
-            if (movement == Vector3.Zero)
-            {
-                if (Math.Abs(currentVelocity.X) < 0.2f)
-                {
-                    currentVelocity.X = 0;
-                }
-                else
-                {
-                    currentVelocity.X -= Math.Sign(currentVelocity.X) * FrictionConst;
-                }
-                if (Math.Abs(currentVelocity.Z) < 0.2f)
-                {
-                    currentVelocity.Z = 0;
-                }
-                else
-                {
-                    currentVelocity.Z -= Math.Sign(currentVelocity.Z) * FrictionConst;
-                }
-            }
-
-            if (currentVelocity.X < -MaxVelocity)
-                currentVelocity.X = -MaxVelocity;
-            if (currentVelocity.X > MaxVelocity)
-                currentVelocity.X = MaxVelocity;
-            if (currentVelocity.Z < -MaxVelocity)
-                currentVelocity.Z = -MaxVelocity;
-            if (currentVelocity.Z > MaxVelocity)
-                currentVelocity.Z = MaxVelocity;
-       
-
 
             if (heightMapInfo.IsOnHeightmap(newSpherePosition))
             {
@@ -831,7 +820,7 @@ namespace HeightmapCollision
             // Check for exit.
             if (input.exit())
             {
-                spherePosition = Vector3.Zero;
+                spherePosition = levelValues[currentLevel].initialPosition;
                 sphereFacingDirection = 0;
                 currentState = GameState.MAINMENU;
             }
@@ -840,18 +829,19 @@ namespace HeightmapCollision
             {
                 spherePosition = levelValues[currentLevel].initialPosition;
                 sphereFacingDirection = 0;
-                currentVelocity = Vector3.Zero;
             }
 
             if (player == PlayerIndex.One)
             {
                 p1Position = spherePosition;
                 p1Facing = sphereFacingDirection;
+                p1RollingMatrix = sphereRollingMatrix;
             }
             else if (player == PlayerIndex.Two)
             {
                 p2Position = spherePosition;
                 p2Facing = sphereFacingDirection;
+                p2RollingMatrix = sphereRollingMatrix;
             }
         }
 
