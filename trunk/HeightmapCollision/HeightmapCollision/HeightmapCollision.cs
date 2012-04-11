@@ -111,6 +111,7 @@ namespace HeightmapCollision
         Matrix p2Projection;
 
         Vector3 spherePosition;
+        Vector3 flagPosition;
         Vector3 p1Position;
         Vector3 p2Position;
         float sphereFacingDirection;
@@ -119,6 +120,7 @@ namespace HeightmapCollision
         Matrix sphereRollingMatrix = Matrix.Identity;
 
         Model sphere;
+        Model flag;
         HeightMapInfo heightMapInfo;
 
         InputHandler input;
@@ -166,7 +168,7 @@ namespace HeightmapCollision
 
         bool isOnFinish(Vector3 s)
         {
-            Console.WriteLine("X: {0} Z: {1}", spherePosition.X, spherePosition.Z);
+            //Console.WriteLine("X: {0} Z: {1}", spherePosition.X, spherePosition.Z);
             if ((s.X <= levelValues[currentLevel].xMax) &&
                 (s.X >= levelValues[currentLevel].xMin) &&
                 (s.Z <= levelValues[currentLevel].yMax) &&
@@ -226,6 +228,9 @@ namespace HeightmapCollision
             else
                 spherePosition = Vector3.Zero;
 
+            flagPosition = Vector3.Zero;
+            flagPosition.X = levelValues[currentLevel].xMax;
+            flagPosition.Z = levelValues[currentLevel].yMax;
             terrain = Content.Load<Model>(levelName);
             spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
             // The terrain processor attached a HeightMapInfo to the terrain model's
@@ -242,6 +247,7 @@ namespace HeightmapCollision
             }
             
             sphere = Content.Load<Model>("sphere");
+            flag = Content.Load<Model>("flag");
 
             cursor = Content.Load<Texture2D>("Cursor");
             hand = Content.Load<Texture2D>("Cursor");
@@ -476,6 +482,8 @@ namespace HeightmapCollision
                     DrawModel(terrain, Matrix.Identity, p1View, projectionMatrix);
                     DrawModel(sphere, sphereRollingMatrix * 
                         Matrix.CreateTranslation(p1Position), p1View, projectionMatrix);
+                    DrawModel(flag, Matrix.CreateTranslation(flagPosition), p1View, projectionMatrix);
+                    isOnFinish(p1Position);
                     break;
                 case GameState.INGAME2P:
                     Viewport original = graphics.GraphicsDevice.Viewport;
@@ -566,8 +574,6 @@ namespace HeightmapCollision
 
         #region Handle Input
 
-
-
         /// <summary>
         /// Handles input for quitting the game.
         /// </summary>
@@ -616,7 +622,10 @@ namespace HeightmapCollision
 
             Vector3 oldNormal;
             Vector3 newNormal;
-            heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
+            if (heightMapInfo.IsOnHeightmap(newSpherePosition))
+            {
+                heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
+            }
 
             if (input.jumped() && !hasJumped && !gravity)
             {
