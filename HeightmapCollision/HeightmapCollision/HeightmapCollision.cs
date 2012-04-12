@@ -321,7 +321,7 @@ namespace HeightmapCollision
                 case GameState.INGAME:
                     HandleInput(PlayerIndex.One);
                     UpdateCamera(PlayerIndex.One);
-                    Console.WriteLine("Ball position is: {0}", p1Position.ToString());
+                   // Console.WriteLine("Ball position is: {0}", p1Position.ToString());
                     if (isOnFinish(p1Position))
                     {
                         currentState = GameState.MAINMENU;
