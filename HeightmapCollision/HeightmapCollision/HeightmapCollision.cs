@@ -68,7 +68,7 @@ namespace HeightmapCollision
         // and when computing how far the sphere has rolled.
         const float SphereRadius = 12.0f;
 
-        const float FrictionConst = .4f;
+        const float FrictionConst = .04f;
 
         //value used for falling ball
         const float gravityConst = 2.0f;
@@ -148,7 +148,9 @@ namespace HeightmapCollision
         float oldHeight;
         float newHeight;
 
-	Vector3 currentVelocity;
+	    Vector3 currentVelocity;
+        Vector3 p1Velocity;
+        Vector3 p2Velocity;
 
         bool gravity;
 
@@ -165,7 +167,7 @@ namespace HeightmapCollision
             new finishValues(2500, 2800, 2500, 2800), //Level One
             new finishValues(-3150, -2850, 2500, 2800), // Level Two
             new finishValues(2600, 2750, 2600, 2750), //Level Three
-            new finishValues(-3220,-2601,-3812,-3193, new Vector3(-3250, 0, 1875)) // Level Four
+            new finishValues(-3220,-2601,-3812,-3193, new Vector3(-3073, 0, 1847)) // Level Four
             //This is the sphere position approximated
         };
 
@@ -184,7 +186,8 @@ namespace HeightmapCollision
             gravity = false;
             hasJumped = false;
             currentLevel = 0;
-	    currentVelocity = Vector3.Zero;
+	        p1Velocity = Vector3.Zero;
+            p2Velocity = Vector3.Zero;
         }
 
         bool isOnFinish(Vector3 s)
@@ -274,8 +277,12 @@ namespace HeightmapCollision
             string levelName = "level_";
             levelName += Convert.ToString(currentLevel + 1);
 
-            spherePosition = levelValues[currentLevel].initialPosition;
-	    currentVelocity = Vector3.Zero;
+            p1Position = levelValues[currentLevel].initialPosition;
+            p2Position = levelValues[currentLevel].initialPosition;
+            p1Facing = 0;
+            p2Facing = 0;
+	        p1Velocity = Vector3.Zero;
+            p2Velocity = Vector3.Zero;
 
             flagPosition = Vector3.Zero;
             flagPosition.X = levelValues[currentLevel].xMax;
@@ -319,11 +326,6 @@ namespace HeightmapCollision
                     {
                         currentState = GameState.MAINMENU;
 
-                        p1Position = levelValues[currentLevel].initialPosition;
-                        p1Facing = 0;
-                        p2Position = levelValues[currentLevel].initialPosition;
-                        p2Facing = 0;
-
                         if (currentLevel < (numLevels - 1))
                         {
                             ++currentLevel;
@@ -339,11 +341,6 @@ namespace HeightmapCollision
                     if (isOnFinish(p1Position) && isOnFinish(p2Position))
                     {
                         currentState = GameState.MAINMENU;
-                        p1Position = levelValues[currentLevel].initialPosition;
-                        p1Facing = 0;
-                        p2Position = levelValues[currentLevel].initialPosition;
-                        p2Facing = 0;
-
                         if (currentLevel < (numLevels - 1))
                         {
                             ++currentLevel;
@@ -404,7 +401,7 @@ namespace HeightmapCollision
                     graphics.GraphicsDevice.BlendState = BlendState.Opaque;
                     graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
                     graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
-                    spherePosition = Vector3.Zero;
+                    //spherePosition = Vector3.Zero;
                 }
                 return;
             }
@@ -434,10 +431,10 @@ namespace HeightmapCollision
                 graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
                 graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
                 currentState = buttonState;
-                if (currentState == GameState.INGAME)
-                {
-                    spherePosition = Vector3.Zero;
-                }
+                //if (currentState == GameState.INGAME)
+                //{
+                //    spherePosition = Vector3.Zero;
+                //}
                 return;
             }
 
@@ -622,12 +619,14 @@ namespace HeightmapCollision
                 spherePosition = p1Position;
                 sphereFacingDirection = p1Facing;
                 sphereRollingMatrix = p1RollingMatrix;
+                currentVelocity = p1Velocity;
             }
             else if (player == PlayerIndex.Two)
             {
                 spherePosition = p2Position;
                 sphereFacingDirection = p2Facing;
                 sphereRollingMatrix = p2RollingMatrix;
+                currentVelocity = p2Velocity;
             }
 
             // Now move the sphere. First, we want to check to see if the sphere should
@@ -644,7 +643,7 @@ namespace HeightmapCollision
             movement = Vector3.Zero;
 
             movement.Z = input.moveAmount(player);
-            movement.X = input.strafeAmount(player);
+            //movement.X = input.strafeAmount(player);
 
             Vector3 newSpherePosition = spherePosition + currentVelocity;
 
@@ -698,21 +697,22 @@ namespace HeightmapCollision
             Matrix sphereFacingMatrix = Matrix.CreateRotationY(sphereFacingDirection);
 
             currentVelocity += Vector3.Transform(movement, sphereFacingMatrix);
-            if (Math.Abs(currentVelocity.X) < 0.2f)
+            
+            if (Math.Abs(currentVelocity.X) < 0.05f)
             {
                 currentVelocity.X = 0;
             }
             else
             {
-                currentVelocity.X -= Math.Sign(currentVelocity.X) * FrictionConst;
+                currentVelocity.X -= currentVelocity.X * FrictionConst;
             }
-            if (Math.Abs(currentVelocity.Z) < 0.2f)
+            if (Math.Abs(currentVelocity.Z) < 0.05f)
             {
                 currentVelocity.Z = 0;
             }
             else
             {
-                currentVelocity.Z -= Math.Sign(currentVelocity.Z) * FrictionConst;
+                currentVelocity.Z -= currentVelocity.Z * FrictionConst;
             }
 
             if (currentVelocity.X < -MaxVelocity)
@@ -868,12 +868,14 @@ namespace HeightmapCollision
                 p1Position = spherePosition;
                 p1Facing = sphereFacingDirection;
                 p1RollingMatrix = sphereRollingMatrix;
+                p1Velocity = currentVelocity;
             }
             else if (player == PlayerIndex.Two)
             {
                 p2Position = spherePosition;
                 p2Facing = sphereFacingDirection;
                 p2RollingMatrix = sphereRollingMatrix;
+                p2Velocity = currentVelocity;
             }
         }
 
