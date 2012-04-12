@@ -47,7 +47,8 @@ namespace HeightmapCollision
                         MaxDeviationRadius = 0.0f,
                         Prediction = 0.0f
                     };
-                    sensor.SkeletonStream.Enable(parameters);
+                    //sensor.SkeletonStream.Enable(parameters);
+                    sensor.SkeletonStream.Enable();
                 }
                 sensor.Start();
             }
@@ -123,7 +124,9 @@ namespace HeightmapCollision
                     }
 
                     currentSkeleton = skeletonPlayerOne;
-                    computeArmLength();
+                    armLengthP1 = computeArmLength();
+                    currentSkeleton = skeletonPlayerTwo;
+                    armLengthP2 = computeArmLength();
                     sframe.Dispose();
                 }
             }
@@ -260,12 +263,12 @@ namespace HeightmapCollision
                 currentSkeleton = skeletonPlayerOne;
                 
                 if (currentKeyboardState.IsKeyDown(Keys.Left) ||
-                    leftArmExtended())
+                    leftArmExtended(player))
                 {
                     result += 1;
                 }
                 if (currentKeyboardState.IsKeyDown(Keys.Right) ||
-                    rightArmExtended())
+                    rightArmExtended(player))
                 {
                     result -= 1;
                 }
@@ -274,12 +277,12 @@ namespace HeightmapCollision
             {
                 currentSkeleton = skeletonPlayerTwo;
                 if (currentKeyboardState.IsKeyDown(Keys.A) ||
-                    leftArmExtended())
+                    leftArmExtended(player))
                 {
                     result += 1;
                 }
                 if (currentKeyboardState.IsKeyDown(Keys.D) ||
-                    rightArmExtended())
+                    rightArmExtended(player))
                 {
                     result -= 1;
                 }
@@ -292,29 +295,51 @@ namespace HeightmapCollision
             return result;
         }
 
-        bool rightArmExtended()
+        bool rightArmExtended(PlayerIndex player)
         {
+            if (player == PlayerIndex.One)
+            {
+                currentSkeleton = skeletonPlayerOne;
+                armLength = armLengthP1;
+            }
+            else if (player == PlayerIndex.Two)
+            {
+                currentSkeleton = skeletonPlayerTwo;
+                armLength = armLengthP2;
+            } 
+
             if (currentSkeleton == null)
                 return false;
 
             Joint rHand = currentSkeleton.Joints[JointType.HandRight];
             Joint rShoulder = currentSkeleton.Joints[JointType.ShoulderRight];
 
-            if (distance(rHand, rShoulder) > 1.5 * armLength)
+            if (distance(rHand, rShoulder) > 2 * armLength)
                 return true;
 
             return false;
         }
 
-        bool leftArmExtended()
+        bool leftArmExtended(PlayerIndex player)
         {
+            if (player == PlayerIndex.One)
+            {
+                currentSkeleton = skeletonPlayerOne;
+                armLength = armLengthP1;
+            }
+            else if (player == PlayerIndex.Two)
+            {
+                currentSkeleton = skeletonPlayerTwo;
+                armLength = armLengthP2;
+            }
+
             if (currentSkeleton == null)
                 return false;
 
             Joint lHand = currentSkeleton.Joints[JointType.HandLeft];
             Joint lShoulder = currentSkeleton.Joints[JointType.ShoulderLeft];
 
-            if (distance(lHand, lShoulder) > 1.5 * armLength)
+            if (distance(lHand, lShoulder) > 2 * armLength)
                 return true;
             return false;
         }
@@ -356,9 +381,15 @@ namespace HeightmapCollision
         public Vector2 getHandPosition(PlayerIndex player)
         {
             if (player == PlayerIndex.One)
+            {
                 currentSkeleton = skeletonPlayerOne;
+                armLength = armLengthP1;
+            }
             else if (player == PlayerIndex.Two)
+            {
                 currentSkeleton = skeletonPlayerTwo;
+                armLength = armLengthP2;
+            }
 
             if (currentSkeleton == null)
                 return new Vector2(-55);
@@ -391,15 +422,17 @@ namespace HeightmapCollision
             return handPosition;
         }
 
-        void computeArmLength()
+        float computeArmLength()
         {
             if (currentSkeleton != null)
             {
                 Joint rShoulder = currentSkeleton.Joints[JointType.ShoulderRight];
                 Joint rElbow = currentSkeleton.Joints[JointType.ElbowRight];
 
-                armLength = distance(rShoulder, rElbow);
+                return distance(rShoulder, rElbow);
             }
+            else
+                return armLength;
         }
         float distance(Joint a, Joint b)
         {
