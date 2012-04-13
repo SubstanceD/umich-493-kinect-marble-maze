@@ -85,8 +85,6 @@ namespace HeightmapCollision
         // from the sphere's position.
         readonly Vector3 CameraTargetOffset = new Vector3(0, 30, 0);
 
-
-
         #endregion
 
         #region Fields
@@ -109,9 +107,7 @@ namespace HeightmapCollision
         Texture2D hand;
         Vector2 handPos;
 
-        SpriteBatch spriteBatch;
-
-        
+        SpriteBatch spriteBatch;        
 
         GraphicsDeviceManager graphics;
         Viewport leftViewport;
@@ -152,12 +148,13 @@ namespace HeightmapCollision
         Vector3 p1Velocity;
         Vector3 p2Velocity;
 
-        bool gravity;
+        bool[] gravity;
+        bool[] hasJumped;
+        float[] jumpHeight;
 
         Vector3 movement;
 
-        bool hasJumped;
-        float jumpHeight;
+        
 
         public int currentLevel;
         static public int numLevels = 4;
@@ -183,8 +180,13 @@ namespace HeightmapCollision
             graphics.PreferredBackBufferWidth = 1280;
             input = new InputHandler(graphics);
             Content.RootDirectory = "Content";
-            gravity = false;
-            hasJumped = false;
+            gravity = new bool[2];
+            gravity[0] = false;
+            gravity[1] = false;
+            hasJumped = new bool[2];
+            hasJumped[0] = false;
+            hasJumped[1] = false;
+            jumpHeight = new float[2];
             currentLevel = 0;
 	        p1Velocity = Vector3.Zero;
             p2Velocity = Vector3.Zero;
@@ -632,9 +634,16 @@ namespace HeightmapCollision
             // Now move the sphere. First, we want to check to see if the sphere should
             // turn. turnAmount will be an accumulation of all the different possible
             // inputs.
-
-            sphereFacingDirection += input.turnAmount(player) *SphereTurnSpeed;
-
+            GamePadState gp = GamePad.GetState(player);
+            float cameraMove = -gp.ThumbSticks.Right.X;
+            if (cameraMove == 0)
+            {
+                sphereFacingDirection += input.turnAmount(player) * SphereTurnSpeed;
+            }
+            else
+            {
+                sphereFacingDirection += cameraMove * SphereTurnSpeed;
+            }
 
             // Next, we want to move the sphere forward or back. to do this, 
             // we'll create a Vector3 and modify use the user's input to modify the Z
@@ -645,6 +654,16 @@ namespace HeightmapCollision
             movement.Z = input.moveAmount(player);
             //movement.X = input.strafeAmount(player);
 
+            
+            Vector2 move = gp.ThumbSticks.Left;
+
+            //move.Normalize();
+            if (move != Vector2.Zero)
+            {
+                movement.X = move.X;
+                movement.Z = -move.Y;
+            }
+
             Vector3 newSpherePosition = spherePosition + currentVelocity;
 
             Vector3 oldNormal;
@@ -654,14 +673,26 @@ namespace HeightmapCollision
                 heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
             }
 
-            if (input.jumped() && !hasJumped && !gravity)
+            int playerIndex;
+            if (player == PlayerIndex.One)
             {
-                hasJumped = true;
-                jumpHeight = spherePosition.Y + SphereRadius * 2;
+                playerIndex = 0;
+            }
+            else
+            {
+                playerIndex = 1;
+            }
+
+            if (input.jumped(player) && !hasJumped[playerIndex] && !gravity[playerIndex])
+            {
+                hasJumped[playerIndex] = true;
+                jumpHeight[playerIndex] = spherePosition.Y + SphereRadius * 2;
             }
 
 
-            if (gravity)
+
+
+            if (gravity[playerIndex])
             {
                 if ((spherePosition.Y - movement.Y) > (newHeight + SphereRadius))
                 {
@@ -670,22 +701,22 @@ namespace HeightmapCollision
                 else
                 {
                     newSpherePosition.Y = newHeight + SphereRadius;
-                    gravity = false;
+                    gravity[playerIndex] = false;
                     currentVelocity.Y = 0;
                     movement.Y = 0;
                 }
             }
 
-            if (hasJumped)
+            if (hasJumped[playerIndex])
             {
-                if (spherePosition.Y < jumpHeight)
+                if (spherePosition.Y < jumpHeight[playerIndex])
                 {
                     movement.Y = jumpConst;
                 }
                 else
                 {
-                    gravity = true;
-                    hasJumped = false;
+                    gravity[playerIndex] = true;
+                    hasJumped[playerIndex] = false;
                     movement.Y = 0;
                 }
             }
@@ -736,7 +767,7 @@ namespace HeightmapCollision
                 heightMapInfo.GetHeightAndNormal(spherePosition, out oldHeight, out oldNormal);
                 heightMapInfo.GetHeightAndNormal(newSpherePosition, out newHeight, out newNormal);
                 
-                if (!gravity && !hasJumped)
+                if (!gravity[playerIndex] && !hasJumped[playerIndex])
                 {
                     newSpherePosition.Y = oldHeight + SphereRadius;
                 }
@@ -747,7 +778,7 @@ namespace HeightmapCollision
                     if ((Math.Acos(Vector3.Dot(newNormal, Vector3.Up))) < .4)
                     {
                         //Console.WriteLine("I am here: {0}", Math.Acos(Vector3.Dot(newNormal, Vector3.Up)));
-                        if (hasJumped)
+                        if (hasJumped[playerIndex])
                         {
                             newSpherePosition.Y = newHeight + SphereRadius + 3;
                         }
@@ -755,7 +786,7 @@ namespace HeightmapCollision
                     else
                     {
                         //Console.WriteLine("I am not going up a wall ever!");
-                        if (!gravity && !hasJumped)
+                        if (!gravity[playerIndex] && !hasJumped[playerIndex])
                         {
                             newSpherePosition = spherePosition;
                         }
@@ -777,9 +808,9 @@ namespace HeightmapCollision
                         else
                         {
                             // Console.WriteLine("I am here: {0}", Math.Acos(Vector3.Dot(newNormal, Vector3.Up)));
-                            if (!hasJumped)
+                            if (!hasJumped[playerIndex])
                             {
-                                gravity = true;
+                                gravity[playerIndex] = true;
                             }
                         }
                     }
@@ -794,7 +825,7 @@ namespace HeightmapCollision
                     if (heightMapInfo.IsOnHeightmap(checkSpherePosition))
                     {
                         heightMapInfo.GetHeightAndNormal(checkSpherePosition, out newHeight, out newNormal);
-                        if (gravity)
+                        if (gravity[playerIndex])
                         {
                             if (newHeight > spherePosition.Y)
                             {
@@ -857,7 +888,7 @@ namespace HeightmapCollision
                 currentState = GameState.MAINMENU;
             }
 
-            if (input.reset())
+            if (input.reset(player))
             {
                 spherePosition = levelValues[currentLevel].initialPosition;
                 sphereFacingDirection = 0;
