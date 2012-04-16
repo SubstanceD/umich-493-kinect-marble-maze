@@ -44,14 +44,14 @@ namespace HeightmapCollision
                 {
                     TransformSmoothParameters parameters = new TransformSmoothParameters
                     {
-                        Smoothing = 0.3f,
-                        Correction = 0.0f,
-                        JitterRadius = 0.0f,
-                        MaxDeviationRadius = 0.0f,
-                        Prediction = 0.0f
+                        Smoothing = 0.5f,
+                        Correction = 0.5f,
+                        Prediction = 0.4f,
+                        JitterRadius = .2f,
+                        MaxDeviationRadius = 0.1f
                     };
-                    //sensor.SkeletonStream.Enable(parameters);
-                    sensor.SkeletonStream.Enable();
+                    sensor.SkeletonStream.Enable(parameters);
+                    //sensor.SkeletonStream.Enable();
                 }
                 sensor.Start();
             }
@@ -136,6 +136,13 @@ namespace HeightmapCollision
                 }
             }
 
+        }
+
+        public bool kinectAttached()
+        {
+            if (sensor == null)
+                return false;
+            return true;
         }
 
         //move forward amount
@@ -239,7 +246,7 @@ namespace HeightmapCollision
                 Joint shoulder = currentSkeleton.Joints[JointType.ShoulderCenter];
                 Joint spine = currentSkeleton.Joints[JointType.Spine];
 
-                if (shoulder.Position.Z + 0.025f < spine.Position.Z)
+                if (shoulder.Position.Z < spine.Position.Z)
                     return true;
             }
 
@@ -410,7 +417,7 @@ namespace HeightmapCollision
 
 
         //get hand position
-        public Vector2 getHandPosition(PlayerIndex player)
+        public Vector2 getHandPosition(PlayerIndex player, Viewport viewport)
         {
             if (player == PlayerIndex.One)
             {
@@ -435,7 +442,7 @@ namespace HeightmapCollision
             float rShoulderX = currentSkeleton.Joints[JointType.ShoulderRight].Position.X;
             float lShoulderX = currentSkeleton.Joints[JointType.ShoulderLeft].Position.X;
 
-            Viewport viewport = graphics.GraphicsDevice.Viewport;
+            //Viewport viewport = graphics.GraphicsDevice.Viewport;
 
             int viewMinX = viewport.X;
             int viewMaxX = viewMinX + viewport.Width;
