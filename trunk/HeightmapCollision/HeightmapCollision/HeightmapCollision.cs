@@ -51,7 +51,7 @@ namespace HeightmapCollision
 
     public enum GameState
     {
-        MAINMENU, INGAME, NOCHANGE, EXIT, INGAME2P, SELECTPLAYERS, FINISH
+        MAINMENU, INGAME, NOCHANGE, EXIT, INGAME2P, SELECTPLAYERS, FINISH, BETWEENLEVELS, READY
     };
 
     public class HeightmapCollisionGame : Microsoft.Xna.Framework.Game
@@ -88,6 +88,8 @@ namespace HeightmapCollision
         #endregion
 
         #region Fields
+        //for drawing time to the screen
+        SpriteFont font;
 
         //main menu buttons
         Button startButton;
@@ -101,11 +103,36 @@ namespace HeightmapCollision
         Button twoPlayerButton;
         Button cancelButton;
 
+        //BetweenLevels buttons
+        Button readyButton;
+        Button mainMenuButton;
+
+        Button readyButtonP1;
+        Button readyButtonP2;
+        Button mainMenuButtonP1;
+        Button mainMenuButtonP2;
+
+        //Finish buttons (if necessary)
+
+        bool p1IsReady = false;
+        bool p2IsReady = false;
+        bool p1HasFinished = false;
+        bool p2HasFinished = false;
+        bool onePlayerGame = false;
+
+        TimeSpan p1TotalTime;
+        TimeSpan p1LevelTime;
+        TimeSpan p2TotalTime;
+        TimeSpan p2LevelTime;
+
+        TimeSpan levelStart;
+
         Texture2D cursor;
         Vector2 cursorPos;
 
         Texture2D hand;
-        Vector2 handPos;
+        Vector2 handPosP1;
+        Vector2 handPosP2;
 
         SpriteBatch spriteBatch;        
 
@@ -221,16 +248,8 @@ namespace HeightmapCollision
             Viewport original = graphics.GraphicsDevice.Viewport;
 
             leftViewport = new Viewport(new Rectangle(original.X, original.Y,original.Width / 2, original.Height));
-            //leftViewport.X = original.X;
-            //leftViewport.Y = original.Y;
-            //leftViewport.Width = original.Width / 2;
-            //leftViewport.Height = original.Height;
 
             rightViewport = new Viewport(new Rectangle(original.X + leftViewport.Width, original.Y, original.Width / 2, original.Height));
-            //rightViewport.X = original.X + leftViewport.Width;
-            //rightViewport.Y = original.Y;
-            //rightViewport.Width = original.Width / 2;
-            //rightViewport.Height = original.Height;
 
             p1Projection = Matrix.CreatePerspectiveFieldOfView(
                MathHelper.ToRadians(45.0f), rightViewport.AspectRatio, 1f, 10000);
@@ -247,6 +266,8 @@ namespace HeightmapCollision
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
+
+            font = Content.Load<SpriteFont>("SpriteFont1");
             
             sphere = Content.Load<Model>("sphere");
             flag = Content.Load<Model>("flag");
@@ -270,6 +291,24 @@ namespace HeightmapCollision
             twoPlayerButton = new Button(position, Content.Load<Texture2D>("TwoPlayer"), Content.Load<Texture2D>("TwoPlayerHi"), GameState.INGAME2P);
             position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("OnePlayer").Width / 2, 475, 400, 200);
             cancelButton = new Button(position, Content.Load<Texture2D>("MainMenu"), Content.Load<Texture2D>("MainMenuHi"), GameState.MAINMENU);
+
+            //betweenlevels buttons
+            position = new Rectangle(0, 0, Content.Load<Texture2D>("PlayButton").Width, Content.Load<Texture2D>("PlayButtonHi").Height);
+            readyButton = new Button(position, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.INGAME);
+            position = new Rectangle(0, 400, 200, 200);
+            mainMenuButton = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.MAINMENU);
+
+            //also need buttons for the two player version
+            position = new Rectangle(0, 0, Content.Load<Texture2D>("PlayButton").Width, Content.Load<Texture2D>("PlayButtonHi").Height);
+            readyButtonP1 = new Button(position, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.INGAME);
+            position = new Rectangle(0, 400, 200, 200);
+            mainMenuButtonP1 = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.MAINMENU);
+
+            position = new Rectangle(0 + leftViewport.Width, 0, Content.Load<Texture2D>("PlayButton").Width, Content.Load<Texture2D>("PlayButtonHi").Height);
+            readyButtonP2 = new Button(position, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.INGAME);
+            position = new Rectangle(0 + leftViewport.Width, 400, 200, 200);
+            mainMenuButtonP2 = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.MAINMENU);
+
 
             loadLevel();
         }
@@ -321,32 +360,73 @@ namespace HeightmapCollision
             switch (currentState)
             {
                 case GameState.INGAME:
-                    HandleInput(PlayerIndex.One);
-                    UpdateCamera(PlayerIndex.One);
+
+                    if (!p1HasFinished)
+                    {
+                        HandleInput(PlayerIndex.One);
+                        UpdateCamera(PlayerIndex.One);
+                        p1LevelTime = gameTime.TotalGameTime - levelStart;
+                    }
                    // Console.WriteLine("Ball position is: {0}", p1Position.ToString());
                     if (isOnFinish(p1Position))
                     {
-                        currentState = GameState.MAINMENU;
-
+                        p1TotalTime += p1LevelTime;
+                        p1HasFinished = true;
+                    }
+                    if (p1HasFinished)
+                    {
+                        p1HasFinished = false;
                         if (currentLevel < (numLevels - 1))
                         {
+                            currentState = GameState.BETWEENLEVELS;
                             ++currentLevel;
                             loadLevel();
+                        }
+                        else
+                        {
+                            currentState = GameState.FINISH;
                         }
                     }
                     break;
                 case GameState.INGAME2P:
-                    HandleInput(PlayerIndex.One);
-                    UpdateCamera(PlayerIndex.One);
-                    HandleInput(PlayerIndex.Two);
-                    UpdateCamera(PlayerIndex.Two);
-                    if (isOnFinish(p1Position) && isOnFinish(p2Position))
+
+                    if (!p1HasFinished)
                     {
-                        currentState = GameState.MAINMENU;
+                        HandleInput(PlayerIndex.One);
+                        UpdateCamera(PlayerIndex.One);
+                        p1LevelTime = gameTime.TotalGameTime - levelStart;
+                    }
+
+                    if (!p2HasFinished)
+                    {
+                        HandleInput(PlayerIndex.Two);
+                        UpdateCamera(PlayerIndex.Two);
+                        p2LevelTime = gameTime.TotalGameTime - levelStart;
+                    }
+
+                    if (isOnFinish(p1Position))
+                    {
+                        p1TotalTime += p1LevelTime;
+                        p1HasFinished = true;
+                    }
+                    if (isOnFinish(p2Position))
+                    {
+                        p2TotalTime += p2LevelTime;
+                        p2HasFinished = true;
+                    }
+                    if (p1HasFinished && p2HasFinished)
+                    {
+                        p1HasFinished = false;
+                        p2HasFinished = false;
                         if (currentLevel < (numLevels - 1))
                         {
+                            currentState = GameState.BETWEENLEVELS;
                             ++currentLevel;
                             loadLevel();
+                        }
+                        else
+                        {
+                            currentState = GameState.FINISH;
                         }
                     }
                     break;
@@ -355,6 +435,9 @@ namespace HeightmapCollision
                     break;
                 case GameState.SELECTPLAYERS:
                     UpdatePlayerSelect(gameTime);
+                    break;
+                case GameState.BETWEENLEVELS:
+                    UpdateBetweenLevels(gameTime);
                     break;
                 case GameState.EXIT:
                     this.Exit();
@@ -370,6 +453,76 @@ namespace HeightmapCollision
             base.Update(gameTime);
         }
 
+        private void UpdateBetweenLevels(GameTime gameTime)
+        {
+            if (onePlayerGame)
+            {
+                handPosP1 = input.getHandPosition(PlayerIndex.One, graphics.GraphicsDevice.Viewport);
+                GameState buttonState;
+                buttonState = mainMenuButton.Update(gameTime, input.getMouse(), handPosP1);
+                if (buttonState != GameState.NOCHANGE)
+                {
+                    currentState = buttonState;
+                    currentLevel = 0;
+                    loadLevel();
+                    return;
+                }
+
+                buttonState = readyButton.Update(gameTime, input.getMouse(), handPosP1);
+
+                if (buttonState != GameState.NOCHANGE)
+                {
+                    levelStart = gameTime.TotalGameTime;
+                    currentState = buttonState;
+                }
+                cursorPos = new Vector2(input.getMouse().X, input.getMouse().Y);
+            }
+            else
+            {
+                GameState buttonState;
+                handPosP1 = input.getHandPosition(PlayerIndex.One, rightViewport);
+                handPosP2 = input.getHandPosition(PlayerIndex.Two, leftViewport);
+                buttonState = mainMenuButtonP1.Update(gameTime, input.getMouse(), handPosP1);
+                if (buttonState != GameState.NOCHANGE)
+                {
+                    currentState = buttonState;
+                    currentLevel = 0;
+                    loadLevel();
+                    return;
+                }
+
+                buttonState = readyButtonP1.Update(gameTime, input.getMouse(), handPosP1);
+
+                if (buttonState != GameState.NOCHANGE)
+                {
+                    p1IsReady = true;
+                }
+
+                buttonState = mainMenuButtonP2.Update(gameTime, input.getMouse(), handPosP2);
+                if (buttonState != GameState.NOCHANGE)
+                {
+                    currentState = buttonState;
+                    currentLevel = 0;
+                    loadLevel();
+                    return;
+                }
+
+                buttonState = readyButtonP2.Update(gameTime, input.getMouse(), handPosP2);
+
+                if (buttonState != GameState.NOCHANGE)
+                {
+                    p2IsReady = true;
+                }
+                cursorPos = new Vector2(input.getMouse().X, input.getMouse().Y);
+
+                if (p1IsReady && p2IsReady)
+                {
+                    levelStart = gameTime.TotalGameTime;
+                    currentState = GameState.INGAME2P;
+                }
+            }
+        }
+
         private void UpdateFinishGame(GameTime gameTime)
         {
             
@@ -378,38 +531,36 @@ namespace HeightmapCollision
         private void UpdatePlayerSelect(GameTime gameTime)
         {
             GameState buttonState;
+            handPosP1 = input.getHandPosition(PlayerIndex.One, graphics.GraphicsDevice.Viewport);
 
-            buttonState = onePlayerButton.Update(gameTime, input.getMouse(), input.getHandPosition(PlayerIndex.One));
+            buttonState = onePlayerButton.Update(gameTime, input.getMouse(), handPosP1);
 
             if (buttonState != GameState.NOCHANGE)
             {
                 currentState = buttonState;
                 if (currentState == GameState.INGAME)
                 {
-                    graphics.GraphicsDevice.BlendState = BlendState.Opaque;
-                    graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-                    graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
+                    levelStart = gameTime.TotalGameTime;
+                    onePlayerGame = true;
                 }
                 return;
             }
 
-            buttonState = twoPlayerButton.Update(gameTime, input.getMouse(), input.getHandPosition(PlayerIndex.One));
+            buttonState = twoPlayerButton.Update(gameTime, input.getMouse(), handPosP1);
 
             if (buttonState != GameState.NOCHANGE)
             {
                 currentState = buttonState;
                 if (currentState == GameState.INGAME2P)
                 {
-                    graphics.GraphicsDevice.BlendState = BlendState.Opaque;
-                    graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-                    graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
-                    //spherePosition = Vector3.Zero;
+                    levelStart = gameTime.TotalGameTime;
+                    onePlayerGame = false;
                 }
                 return;
             }
 
 
-            buttonState = cancelButton.Update(gameTime, input.getMouse(), input.getHandPosition(PlayerIndex.One));
+            buttonState = cancelButton.Update(gameTime, input.getMouse(), handPosP1);
 
             if (buttonState != GameState.NOCHANGE)
             {
@@ -418,29 +569,23 @@ namespace HeightmapCollision
             }
 
             cursorPos = new Vector2(input.getMouse().X, input.getMouse().Y);
-            handPos = input.getHandPosition(PlayerIndex.One);
         }
 
         private void UpdateMainMenu(GameTime gameTime)
         {
             GameState buttonState;
 
-            buttonState = startButton.Update(gameTime, input.getMouse(), input.getHandPosition(PlayerIndex.One));
+            handPosP1 = input.getHandPosition(PlayerIndex.One, graphics.GraphicsDevice.Viewport);
+
+            buttonState = startButton.Update(gameTime, input.getMouse(), handPosP1);
 
             if (buttonState != GameState.NOCHANGE)
             {
-                graphics.GraphicsDevice.BlendState = BlendState.Opaque;
-                graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-                graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
                 currentState = buttonState;
-                //if (currentState == GameState.INGAME)
-                //{
-                //    spherePosition = Vector3.Zero;
-                //}
                 return;
             }
 
-            buttonState = exitButton.Update(gameTime, input.getMouse(), input.getHandPosition(PlayerIndex.One));
+            buttonState = exitButton.Update(gameTime, input.getMouse(), handPosP1);
 
             if (buttonState != GameState.NOCHANGE)
             {
@@ -449,7 +594,6 @@ namespace HeightmapCollision
             }
 
             cursorPos = new Vector2(input.getMouse().X, input.getMouse().Y);
-            handPos = input.getHandPosition(PlayerIndex.One);
         }
 
         /// <summary>
@@ -516,6 +660,11 @@ namespace HeightmapCollision
             switch (currentState)
             {
                 case GameState.INGAME:
+                    
+                    graphics.GraphicsDevice.BlendState = BlendState.Opaque;
+                    graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                    graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
+
                     DrawModel(terrain, Matrix.Identity, p1View, projectionMatrix);
                     DrawModel(sphere, p1RollingMatrix * 
                         Matrix.CreateTranslation(p1Position), p1View, projectionMatrix);
@@ -523,6 +672,11 @@ namespace HeightmapCollision
                     
                     break;
                 case GameState.INGAME2P:
+
+                    graphics.GraphicsDevice.BlendState = BlendState.Opaque;
+                    graphics.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                    graphics.GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
+
                     Viewport original = graphics.GraphicsDevice.Viewport;
                     //player one
                     graphics.GraphicsDevice.Viewport = rightViewport;
@@ -549,8 +703,11 @@ namespace HeightmapCollision
                     startButton.Draw(spriteBatch);
                     exitButton.Draw(spriteBatch);
                     spriteBatch.Draw(cursor, cursorPos, Color.White);
-                    spriteBatch.Draw(hand, handPos, Color.White);
+                    spriteBatch.Draw(hand, handPosP1, Color.White);
                     spriteBatch.End();
+                    break;
+                case GameState.BETWEENLEVELS:
+                    DrawBetweenLevels();
                     break;
                 case GameState.SELECTPLAYERS:
                     spriteBatch.Begin();
@@ -558,7 +715,7 @@ namespace HeightmapCollision
                     twoPlayerButton.Draw(spriteBatch);
                     cancelButton.Draw(spriteBatch);
                     spriteBatch.Draw(cursor, cursorPos, Color.White);
-                    spriteBatch.Draw(hand, handPos, Color.White);
+                    spriteBatch.Draw(hand, handPosP1, Color.White);
                     spriteBatch.End();
                     break;
                 //case GameState.FINISH:
@@ -572,6 +729,31 @@ namespace HeightmapCollision
 
 
             base.Draw(gameTime);
+        }
+
+        void DrawBetweenLevels()
+        {
+            if (onePlayerGame)
+            {
+                spriteBatch.Begin();
+                readyButton.Draw(spriteBatch);
+                mainMenuButton.Draw(spriteBatch);
+                spriteBatch.DrawString(font, p1TotalTime.ToString(), new Vector2(0, 300), Color.White);
+                spriteBatch.Draw(cursor, cursorPos, Color.White);
+                spriteBatch.Draw(hand, handPosP1, Color.White);
+                spriteBatch.End();
+            }
+            else
+            {
+                spriteBatch.Begin();
+                readyButtonP1.Draw(spriteBatch);
+                mainMenuButtonP1.Draw(spriteBatch);
+                readyButtonP2.Draw(spriteBatch);
+                mainMenuButtonP2.Draw(spriteBatch);
+                spriteBatch.Draw(cursor, cursorPos, Color.White);
+                spriteBatch.Draw(hand, handPosP1, Color.White);
+                spriteBatch.End();
+            }
         }
 
 
