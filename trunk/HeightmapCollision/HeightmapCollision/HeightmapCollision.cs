@@ -1049,14 +1049,31 @@ namespace HeightmapCollision
             else
             {
                 Vector3 tempPosition = newSpherePosition;
+                Vector3 tempVelocity;
                 tempPosition.X -= currentVelocity.X;
                 if (heightMapInfo.IsOnHeightmap(tempPosition))
                 {
-                    currentVelocity = Vector3.Reflect(currentVelocity, Vector3.UnitX);
+                    tempVelocity = Vector3.Reflect(currentVelocity, Vector3.UnitX);
+                    if (heightMapInfo.IsOnHeightmap(spherePosition + tempVelocity))
+                    {
+                        heightMapInfo.GetHeightAndNormal(spherePosition + tempVelocity, out newHeight, out newNormal);
+                        if (newHeight <= oldHeight + 10.0f)
+                        {
+                            currentVelocity = tempVelocity;
+                        }
+                    }
                 }
                 else
                 {
-                    currentVelocity = Vector3.Reflect(currentVelocity, Vector3.UnitZ);
+                    tempVelocity = Vector3.Reflect(currentVelocity, Vector3.UnitZ);
+                    if (heightMapInfo.IsOnHeightmap(spherePosition + tempVelocity))
+                    {
+                        heightMapInfo.GetHeightAndNormal(spherePosition + tempVelocity, out newHeight, out newNormal);
+                        if (newHeight <= oldHeight + 10.0f)
+                        {
+                            currentVelocity = tempVelocity;
+                        }
+                    }
                 }
                 newSpherePosition = spherePosition;
             }
