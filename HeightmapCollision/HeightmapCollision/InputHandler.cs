@@ -107,18 +107,22 @@ namespace HeightmapCollision
                     }
                     if (!p1found || !p2found)
                     {
+                        if (!p1found)
+                            IDPlayerOne = -1;
+                        if (!p2found)
+                            IDPlayerTwo = -1;
                         for (int i = 0; i < sframe.SkeletonArrayLength; i++)
                         {
                             if (skeletons[i].TrackingState == SkeletonTrackingState.Tracked)
                             {
                                 currentSkeleton = skeletons[i];
-                                if (!p1found)
+                                if (!p1found && currentSkeleton.TrackingId != IDPlayerTwo)
                                 {
                                     skeletonPlayerOne = currentSkeleton;
                                     IDPlayerOne = skeletonPlayerOne.TrackingId;
                                     p1found = true;
                                 }
-                                else if (!p2found)
+                                else if (!p2found && currentSkeleton.TrackingId != IDPlayerOne)
                                 {
                                     skeletonPlayerTwo = currentSkeleton;
                                     IDPlayerTwo = skeletonPlayerTwo.TrackingId;
