@@ -100,7 +100,9 @@
       <Visible>False</Visible>
     </NestedContentProject>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="HeightmapCollisionWindows_TemporaryKey.pfx" />
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
       <Visible>False</Visible>

@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeightmapCollisionWindows", "HeightmapCollision\HeightmapCollisionWindows.csproj", "{24A55E10-F1A5-4D4B-998E-5FBE08449DC6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{59442399-F564-4302-9FA6-0B8F30AE9071} = {59442399-F564-4302-9FA6-0B8F30AE9071}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeightmapCollisionPipeline", "HeightmapCollisionPipeline\HeightmapCollisionPipeline.csproj", "{59442399-F564-4302-9FA6-0B8F30AE9071}"
 EndProject
