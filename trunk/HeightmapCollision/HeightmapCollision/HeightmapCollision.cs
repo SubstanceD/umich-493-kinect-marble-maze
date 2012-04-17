@@ -94,7 +94,7 @@ namespace HeightmapCollision
         //main menu buttons
         Button startButton;
         Button helpButton;
-        Button highScoresButton;
+        //Button highScoresButton;
         Button exitButton;
         
         //selectplayers buttons
@@ -112,6 +112,9 @@ namespace HeightmapCollision
         Button mainMenuButtonP2;
 
         //Finish buttons (if necessary)
+        Button mainMenuButtonFinish;
+        Texture2D finishGraphic;
+        Rectangle finishGraphicPosition;
 
         bool p1IsReady = false;
         bool p2IsReady = false;
@@ -279,22 +282,24 @@ namespace HeightmapCollision
 
             cursor = Content.Load<Texture2D>("Cursor");
             hand = Content.Load<Texture2D>("Cursor");
+            finishGraphic = Content.Load<Texture2D>("youwin");
 
             //mainmenubuttons
-            Rectangle position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("PlayButton").Width / 2, GraphicsDevice.Viewport.Height / 4 - Content.Load<Texture2D>("PlayButtonHi").Height / 2,
+            Rectangle position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("PlayButton").Width / 2, 75,
                 Content.Load<Texture2D>("PlayButton").Width, Content.Load<Texture2D>("PlayButtonHi").Height);
             startButton = new Button(position, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.SELECTPLAYERS, 0);
 
-            position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("ExitButton").Width / 2, 2*GraphicsDevice.Viewport.Height / 3 - Content.Load<Texture2D>("ExitButtonHi").Height / 2,
+            position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("ExitButton").Width / 2, 475,
                 Content.Load<Texture2D>("ExitButton").Width, Content.Load<Texture2D>("ExitButtonHi").Height);
 
             exitButton = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.EXIT,1);
 
-            position = new Rectangle(0, 0, 200, 200);
-            helpButton = new Button(position, Content.Load<Texture2D>("MainMenu"), Content.Load<Texture2D>("MainMenuHi"), GameState.HIGHSCORES);
+            position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("HelpButton").Width / 2, 275, 
+                Content.Load<Texture2D>("HelpButton").Width, Content.Load<Texture2D>("HelpButton").Height);
+            helpButton = new Button(position, Content.Load<Texture2D>("HelpButton"), Content.Load<Texture2D>("HelpButtonHi"), GameState.HIGHSCORES);
 
-            position = new Rectangle(0, 200, 200, 200);
-            highScoresButton = new Button(position, Content.Load<Texture2D>("NextLevel"), Content.Load<Texture2D>("NextLevelHi"), GameState.HIGHSCORES);
+            //position = new Rectangle(0, 200, 200, 200);
+            //highScoresButton = new Button(position, Content.Load<Texture2D>("NextLevel"), Content.Load<Texture2D>("NextLevelHi"), GameState.HIGHSCORES);
 
             
             //selectPlayers buttons
@@ -331,6 +336,12 @@ namespace HeightmapCollision
             position = new Rectangle(0 + leftViewport.Width, 400, 200, 200);
             mainMenuButtonP1 = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.MAINMENU,1);
             */
+
+            //finish buttons
+            position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("MainMenu").Width / 2, 475, Content.Load<Texture2D>("MainMenu").Width, Content.Load<Texture2D>("MainMenu").Height);
+            mainMenuButtonFinish = new Button(position, Content.Load<Texture2D>("MainMenu"), Content.Load<Texture2D>("MainMenuHi"), GameState.MAINMENU, 1);
+            finishGraphicPosition = new Rectangle(GraphicsDevice.Viewport.Width / 2 - finishGraphic.Width / 2, 50, finishGraphic.Width, finishGraphic.Height);
+
 
             loadLevel();
         }
@@ -627,7 +638,14 @@ namespace HeightmapCollision
 
         private void UpdateFinishGame(GameTime gameTime)
         {
-            
+            GameState buttonState;
+            handPosP1 = input.getHandPosition(PlayerIndex.One, graphics.GraphicsDevice.Viewport);
+            int finishNum = 0; //brian fix this for xbox selection
+            buttonState = mainMenuButtonFinish.Update(gameTime, input.getMouse(), handPosP1, finishNum);
+            if (buttonState != GameState.NOCHANGE)
+            {
+                currentState = buttonState;
+            }
         }
 
         private void UpdatePlayerSelect(GameTime gameTime)
@@ -702,13 +720,13 @@ namespace HeightmapCollision
                 return;
             }
 
-            buttonState = highScoresButton.Update(gameTime, input.getMouse(), handPosP1, mainNum);
+            //buttonState = highScoresButton.Update(gameTime, input.getMouse(), handPosP1, mainNum);
 
-            if (buttonState != GameState.NOCHANGE)
-            {
-                currentState = buttonState;
-                return;
-            }
+            //if (buttonState != GameState.NOCHANGE)
+            //{
+            //    currentState = buttonState;
+            //    return;
+            //}
 
             cursorPos = new Vector2(input.getMouse().X, input.getMouse().Y);
         }
@@ -827,7 +845,7 @@ namespace HeightmapCollision
                     startButton.Draw(spriteBatch);
                     exitButton.Draw(spriteBatch);
                     helpButton.Draw(spriteBatch);
-                    highScoresButton.Draw(spriteBatch);
+                    //highScoresButton.Draw(spriteBatch);
                     spriteBatch.Draw(cursor, cursorPos, Color.White);
                     spriteBatch.Draw(hand, handPosP1, Color.White);
                     spriteBatch.End();
@@ -844,9 +862,14 @@ namespace HeightmapCollision
                     spriteBatch.Draw(hand, handPosP1, Color.White);
                     spriteBatch.End();
                     break;
-                //case GameState.FINISH:
+                case GameState.FINISH:
                     //Need A notice that the player won
-                    //And a exit button
+                    spriteBatch.Begin();
+                    mainMenuButtonFinish.Draw(spriteBatch);
+                    spriteBatch.Draw(finishGraphic, finishGraphicPosition, Color.White);
+                    spriteBatch.Draw(cursor, handPosP1, Color.White);
+                    spriteBatch.End();
+                    break;
 
                 default:
                     //error message
