@@ -41,7 +41,8 @@ namespace HeightmapCollision
             this.buttonNum = buttonNum;
         }
 
-        public GameState Update(GameTime gameTime, MouseState mouseState, Vector2 handPosition, int curNum)
+        public GameState Update(GameTime gameTime, MouseState mouseState, Vector2 handPosition, 
+            int curNum, PlayerIndex player)
         {
             bool mouseHover = false;
             bool handHover = false;
@@ -64,14 +65,14 @@ namespace HeightmapCollision
             else
             {
                 selected = false;
-                if (GamePad.GetState(PlayerIndex.One).IsConnected)
+                if (GamePad.GetState(player).IsConnected)
                 {
                     if (curNum == buttonNum)
                     {
                         mouseHover = true;
                         current = pressed;
                         bool buttonPressed = false;
-                        while (GamePad.GetState(PlayerIndex.One).Buttons.A == ButtonState.Pressed)
+                        while (GamePad.GetState(player).Buttons.A == ButtonState.Pressed)
                         {
                             buttonPressed = true;
                         }
