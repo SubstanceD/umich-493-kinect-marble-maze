@@ -19,6 +19,7 @@ namespace HeightmapCollision
 
         bool selected;
         bool hovering;
+        int buttonNum;
         double hover_start;
 
         public Button(Rectangle pos, Texture2D normal, Texture2D highlighted, GameState transition)
@@ -30,7 +31,17 @@ namespace HeightmapCollision
             current = idle;
         }
 
-        public GameState Update(GameTime gameTime, MouseState mouseState, Vector2 handPosition)
+        public Button(Rectangle pos, Texture2D normal, Texture2D highlighted, GameState transition, int buttonNum)
+        {
+            position = pos;
+            idle = normal;
+            pressed = highlighted;
+            transitionTo = transition;
+            current = idle;
+            this.buttonNum = buttonNum;
+        }
+
+        public GameState Update(GameTime gameTime, MouseState mouseState, Vector2 handPosition, int curNum)
         {
             bool mouseHover = false;
             bool handHover = false;
@@ -53,6 +64,28 @@ namespace HeightmapCollision
             else
             {
                 selected = false;
+                if (GamePad.GetState(PlayerIndex.One).IsConnected)
+                {
+                    if (curNum == buttonNum)
+                    {
+                        mouseHover = true;
+                        current = pressed;
+                        bool buttonPressed = false;
+                        while (GamePad.GetState(PlayerIndex.One).Buttons.A == ButtonState.Pressed)
+                        {
+                            buttonPressed = true;
+                        }
+                        if (buttonPressed)
+                        {
+                            return transitionTo;
+                        }
+                    }
+                    else
+                    {
+                        current = idle;
+                        selected = false;
+                    }
+                }
             }
 
             if (overlap(handPosition, position))

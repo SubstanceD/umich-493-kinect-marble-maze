@@ -2,7 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if !XBOX360
+
 using Microsoft.Kinect;
+
+#endif
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,6 +16,7 @@ namespace HeightmapCollision
 {
     class InputHandler
     {
+        #if !XBOX360
         //set up kinect stuff
         // Kinect declarations
         KinectSensor sensor = null;
@@ -18,6 +24,7 @@ namespace HeightmapCollision
         Skeleton currentSkeleton = null;
         Skeleton skeletonPlayerOne = null;
         Skeleton skeletonPlayerTwo = null;
+        #endif       
         int IDPlayerOne = -1;
         int IDPlayerTwo = -1;
         float armLength;
@@ -46,6 +53,7 @@ namespace HeightmapCollision
         {
             graphics = graphicsManager;
             
+            #if !XBOX360
             // Enable && initialize Kinect
             if (KinectSensor.KinectSensors.Count > 0)
             {
@@ -65,6 +73,7 @@ namespace HeightmapCollision
                 }
                 sensor.Start();
             }
+            #endif
         }
 
 
@@ -79,6 +88,7 @@ namespace HeightmapCollision
 
             currentTime = gameTime;
 
+            #if !XBOX360
             // Get Kinect input if connected
             if (sensor != null)
             {
@@ -154,16 +164,16 @@ namespace HeightmapCollision
                     skeletonsValid = false;
                 else skeletonsValid = true;
             }
-
+            #endif
         }
-
+#if !XBOX360
         public bool kinectAttached()
         {
             if (sensor == null)
                 return false;
             return true;
         }
-
+#endif
         //move forward amount
         public float moveAmount(PlayerIndex player)
         {
@@ -171,6 +181,7 @@ namespace HeightmapCollision
 
             if (player == PlayerIndex.One)
             {
+#if !XBOX360
                 currentSkeleton = skeletonPlayerOne;
                 if (currentKeyboardState.IsKeyDown(Keys.Up) ||
                 leaningForward() || (gp.DPad.Up == ButtonState.Pressed))
@@ -182,11 +193,14 @@ namespace HeightmapCollision
                 {
                     result += 1;
                 }
+#endif
                 Vector2 gpMovement = gp.ThumbSticks.Left;
             }
             else if (player == PlayerIndex.Two)
             {
+#if !XBOX360
                 currentSkeleton = skeletonPlayerTwo;
+#endif
                 if (currentKeyboardState.IsKeyDown(Keys.W) ||
                 leaningForward() || (gp2.DPad.Up == ButtonState.Pressed))
                 {
@@ -211,7 +225,9 @@ namespace HeightmapCollision
             float result = 0;
             if (player == PlayerIndex.One)
             {
+#if !XBOX360
                 currentSkeleton = skeletonPlayerOne;
+#endif
                 if (leaningLeft())
                     result -= 1;
                 if (leaningRight())
@@ -219,7 +235,9 @@ namespace HeightmapCollision
             }
             else if (player == PlayerIndex.Two)
             {
+#if !XBOX360
                 currentSkeleton = skeletonPlayerTwo;
+#endif
                 if (leaningLeft())
                     result -= 1;
                 if (leaningRight())
@@ -232,6 +250,7 @@ namespace HeightmapCollision
 
         bool leaningRight()
         {
+#if !XBOX360
             if (currentSkeleton != null)
             {
                 Joint shoulder = currentSkeleton.Joints[JointType.ShoulderLeft];
@@ -240,12 +259,13 @@ namespace HeightmapCollision
                 if (Math.Abs(shoulder.Position.X - spine.Position.X) < 0.15)
                     return true;
             }
-
+#endif
             return false;
         }
 
         bool leaningLeft()
         {
+#if !XBOX360
             if (currentSkeleton != null)
             {
                 Joint shoulder = currentSkeleton.Joints[JointType.ShoulderRight];
@@ -254,12 +274,13 @@ namespace HeightmapCollision
                 if (Math.Abs(shoulder.Position.X - spine.Position.X) < 0.15)
                     return true;
             }
-
+#endif
             return false;
         }
 
         bool leaningForward()
         {
+#if !XBOX360
             if (currentSkeleton != null)
             {
                 Joint shoulder = currentSkeleton.Joints[JointType.ShoulderCenter];
@@ -268,12 +289,13 @@ namespace HeightmapCollision
                 if (shoulder.Position.Z < spine.Position.Z)
                     return true;
             }
-
+#endif
             return false;
         }
 
         bool leaningBack()
         {
+#if !XBOX360
             if (currentSkeleton != null)
             {
                 Joint shoulder = currentSkeleton.Joints[JointType.ShoulderCenter];
@@ -282,7 +304,7 @@ namespace HeightmapCollision
                 if (shoulder.Position.Z - 0.07f  > spine.Position.Z)
                     return true;
             }
-
+#endif
             return false;
         }
 
@@ -292,8 +314,9 @@ namespace HeightmapCollision
             float result = 0;
             if (player == PlayerIndex.One)
             {
+#if !XBOX360
                 currentSkeleton = skeletonPlayerOne;
-                
+#endif
                 if (currentKeyboardState.IsKeyDown(Keys.Left) ||
                     !leftArmExtended(player) && skeletonsValid || (gp.DPad.Left == ButtonState.Pressed))
                 {
@@ -307,7 +330,9 @@ namespace HeightmapCollision
             }
             else if (player == PlayerIndex.Two)
             {
+#if !XBOX360
                 currentSkeleton = skeletonPlayerTwo;
+#endif
                 if (currentKeyboardState.IsKeyDown(Keys.A) ||
                     !leftArmExtended(player) && skeletonsValid || (gp2.DPad.Left == ButtonState.Pressed))
                 {
@@ -329,6 +354,7 @@ namespace HeightmapCollision
 
         bool rightArmExtended(PlayerIndex player)
         {
+#if !XBOX360
             if (player == PlayerIndex.One)
             {
                 currentSkeleton = skeletonPlayerOne;
@@ -348,12 +374,13 @@ namespace HeightmapCollision
 
             if (distance(rHand, rShoulder) > 1.75 * armLength)
                 return true;
-
+#endif
             return false;
         }
 
         bool leftArmExtended(PlayerIndex player)
         {
+#if !XBOX360
             if (player == PlayerIndex.One)
             {
                 currentSkeleton = skeletonPlayerOne;
@@ -373,6 +400,7 @@ namespace HeightmapCollision
 
             if (distance(lHand, lShoulder) > 1.75 * armLength)
                 return true;
+#endif
             return false;
         }
 
@@ -432,6 +460,7 @@ namespace HeightmapCollision
         bool handAboveHead(PlayerIndex player)
         {
             bool result = false;
+#if !XBOX360
             if(player == PlayerIndex.One)
             {
                 currentSkeleton = skeletonPlayerOne;
@@ -487,6 +516,7 @@ namespace HeightmapCollision
                 handUpTimeP2 = handUpTime;
                 handUpP2 = handUp;
             }
+#endif
             return result;
         }
 
@@ -501,6 +531,7 @@ namespace HeightmapCollision
         //get hand position
         public Vector2 getHandPosition(PlayerIndex player, Viewport viewport)
         {
+#if !XBOX360
             if (player == PlayerIndex.One)
             {
                 currentSkeleton = skeletonPlayerOne;
@@ -541,10 +572,14 @@ namespace HeightmapCollision
                 (viewMinY - headY * ((viewMaxY - viewMinY) / (spineY - headY)));
 
             return handPosition;
+#else
+            return Vector2.Zero;
+#endif
         }
 
         float computeArmLength()
         {
+#if !XBOX360
             if (currentSkeleton != null)
             {
                 Joint rShoulder = currentSkeleton.Joints[JointType.ShoulderRight];
@@ -553,8 +588,10 @@ namespace HeightmapCollision
                 return distance(rShoulder, rElbow);
             }
             else
+#endif
                 return armLength;
         }
+#if !XBOX360
         float distance(Joint a, Joint b)
         {
             double x = a.Position.X
@@ -566,5 +603,6 @@ namespace HeightmapCollision
 
             return (float)Math.Sqrt(x * x + y * y + z * z);
         }
+#endif
     }
 }
