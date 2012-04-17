@@ -25,6 +25,16 @@ namespace HeightmapCollision
         float armLengthP2;
         GamePadState gp;
         GamePadState gp2;
+        GameTime currentTime;
+        float handUpTime;
+        float handUpTimeP1;
+        float handUpTimeP2;
+        bool handUpP1 = false;
+        bool handUpP2 = false;
+        bool handUp;
+
+        bool skeletonsValid = false;
+
 
         KeyboardState currentKeyboardState;
         MouseState currentMouseState;
@@ -59,13 +69,15 @@ namespace HeightmapCollision
 
 
         //update kinect information
-        public void update()
+        public void update(GameTime gameTime)
         {
             //Get mouse, and keyboard info
             currentKeyboardState = Keyboard.GetState();
             currentMouseState = Mouse.GetState();
             gp = GamePad.GetState(PlayerIndex.One);
             gp2 = GamePad.GetState(PlayerIndex.Two);
+
+            currentTime = gameTime;
 
             // Get Kinect input if connected
             if (sensor != null)
@@ -138,6 +150,9 @@ namespace HeightmapCollision
                     armLengthP2 = computeArmLength();
                     sframe.Dispose();
                 }
+                if (skeletonPlayerOne == null && skeletonPlayerTwo == null)
+                    skeletonsValid = false;
+                else skeletonsValid = true;
             }
 
         }
@@ -280,12 +295,12 @@ namespace HeightmapCollision
                 currentSkeleton = skeletonPlayerOne;
                 
                 if (currentKeyboardState.IsKeyDown(Keys.Left) ||
-                    leftArmExtended(player) || (gp.DPad.Left == ButtonState.Pressed))
+                    !leftArmExtended(player) && skeletonsValid || (gp.DPad.Left == ButtonState.Pressed))
                 {
                     result += 1;
                 }
                 if (currentKeyboardState.IsKeyDown(Keys.Right) ||
-                    rightArmExtended(player) || (gp.DPad.Right == ButtonState.Pressed))
+                    !rightArmExtended(player) && skeletonsValid || (gp.DPad.Right == ButtonState.Pressed))
                 {
                     result -= 1;
                 }
@@ -294,12 +309,12 @@ namespace HeightmapCollision
             {
                 currentSkeleton = skeletonPlayerTwo;
                 if (currentKeyboardState.IsKeyDown(Keys.A) ||
-                    leftArmExtended(player) || (gp2.DPad.Left == ButtonState.Pressed))
+                    !leftArmExtended(player) || (gp2.DPad.Left == ButtonState.Pressed))
                 {
                     result += 1;
                 }
                 if (currentKeyboardState.IsKeyDown(Keys.D) ||
-                    rightArmExtended(player) || (gp2.DPad.Right == ButtonState.Pressed))
+                    !rightArmExtended(player) || (gp2.DPad.Right == ButtonState.Pressed))
                 {
                     result -= 1;
                 }
@@ -331,7 +346,7 @@ namespace HeightmapCollision
             Joint rHand = currentSkeleton.Joints[JointType.HandRight];
             Joint rShoulder = currentSkeleton.Joints[JointType.ShoulderRight];
 
-            if (distance(rHand, rShoulder) > 2 * armLength)
+            if (distance(rHand, rShoulder) > 1.75 * armLength)
                 return true;
 
             return false;
@@ -356,7 +371,7 @@ namespace HeightmapCollision
             Joint lHand = currentSkeleton.Joints[JointType.HandLeft];
             Joint lShoulder = currentSkeleton.Joints[JointType.ShoulderLeft];
 
-            if (distance(lHand, lShoulder) > 2 * armLength)
+            if (distance(lHand, lShoulder) > 1.75 * armLength)
                 return true;
             return false;
         }
@@ -396,7 +411,8 @@ namespace HeightmapCollision
             if (player == PlayerIndex.One)
             {
                 if (currentKeyboardState.IsKeyDown(Keys.End) || 
-                    (gp.Buttons.Y == ButtonState.Pressed))
+                    (gp.Buttons.Y == ButtonState.Pressed)
+                    || handAboveHead(player))
                 {
                     return true;
                 }
@@ -404,12 +420,74 @@ namespace HeightmapCollision
             if (player == PlayerIndex.Two)
             {
                 if (currentKeyboardState.IsKeyDown(Keys.R) ||
-                    (gp2.Buttons.Y == ButtonState.Pressed))
+                    (gp2.Buttons.Y == ButtonState.Pressed)
+                    || handAboveHead(player))
                 {
                     return true;
                 }
             }
             return false;
+        }
+
+        bool handAboveHead(PlayerIndex player)
+        {
+            bool result = false;
+            if(player == PlayerIndex.One)
+            {
+                currentSkeleton = skeletonPlayerOne;
+                handUp = handUpP1;
+                handUpTime = handUpTimeP1;
+            }
+            else if(player == PlayerIndex.Two)
+            {
+                currentSkeleton = skeletonPlayerTwo;
+                handUpTime = handUpTimeP2;
+                handUp = handUpP2;
+            }
+
+            if (!handUp)
+            {
+                if (currentSkeleton != null)
+                {
+                    if ((currentSkeleton.Joints[JointType.HandLeft].Position.Y >= currentSkeleton.Joints[JointType.Head].Position.Y) ||
+                        (currentSkeleton.Joints[JointType.HandRight].Position.Y >= currentSkeleton.Joints[JointType.Head].Position.Y))
+                    {
+                        handUp = true;
+                        //result = true;
+                        handUpTime = currentTime.TotalGameTime.Seconds;
+                    }
+                }
+            }
+            else
+            {
+                if (currentSkeleton != null)
+                {
+                    if ((currentSkeleton.Joints[JointType.HandLeft].Position.Y < currentSkeleton.Joints[JointType.Head].Position.Y) &&
+                        (currentSkeleton.Joints[JointType.HandRight].Position.Y < currentSkeleton.Joints[JointType.Head].Position.Y))
+                    {
+                        handUp = false;
+                    }
+                }
+                //Console.WriteLine("current hand up duration: {0}", currentTime.TotalGameTime.Seconds - handUpTime);
+                if ((currentTime.TotalGameTime.Seconds - handUpTime) >= 2)
+                {
+                    result = true;
+                    handUp = false;
+                    handUpTime = currentTime.TotalGameTime.Seconds;
+                }
+            }
+
+            if(player == PlayerIndex.One)
+            {
+                handUpP1 = handUp;
+                handUpTimeP1 = handUpTime;
+            }
+            else if(player == PlayerIndex.Two)
+            {
+                handUpTimeP2 = handUpTime;
+                handUpP2 = handUp;
+            }
+            return result;
         }
 
         //get mouse data
