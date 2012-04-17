@@ -1,5 +1,4 @@
 Content\sphere.xnb
-Content\flag.xnb
 Content\Cursor.xnb
 Content\YouWin.xnb
 Content\level_1.xnb
@@ -18,10 +17,11 @@ Content\TwoPlayerHi.xnb
 Content\NextLevel.xnb
 Content\NextLevelHi.xnb
 Content\level_4.xnb
-Content\SpriteFont1.xnb
 Content\pawball_0.xnb
 Content\rocks_0.xnb
 Content\test_0.xnb
+Content\flag.xnb
+Content\SpriteFont1.xnb
 Content\level_1.bmp
 Content\level_2.bmp
 Content\level_3.bmp
