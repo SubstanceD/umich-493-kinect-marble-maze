@@ -44,6 +44,7 @@ namespace HeightmapCollision
 
 
         KeyboardState currentKeyboardState;
+        KeyboardState lastKeyboardState;
         MouseState currentMouseState;
 
         //for viewport use
@@ -81,6 +82,7 @@ namespace HeightmapCollision
         public void update(GameTime gameTime)
         {
             //Get mouse, and keyboard info
+            lastKeyboardState = currentKeyboardState;
             currentKeyboardState = Keyboard.GetState();
             currentMouseState = Mouse.GetState();
             gp = GamePad.GetState(PlayerIndex.One);
@@ -166,6 +168,12 @@ namespace HeightmapCollision
             }
             #endif
         }
+
+        public bool isNewKeyPress(Keys key)
+        {
+            return currentKeyboardState.IsKeyDown(key) && lastKeyboardState.IsKeyUp(key);
+        }
+
 #if !XBOX360
         public bool kinectAttached()
         {
