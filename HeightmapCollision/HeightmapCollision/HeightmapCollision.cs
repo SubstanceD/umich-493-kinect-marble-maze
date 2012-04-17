@@ -968,12 +968,21 @@ namespace HeightmapCollision
                     else
                     {
                         //Console.WriteLine("I am not going up a wall ever!");
-                        if (!gravity[playerIndex] && !hasJumped[playerIndex])
+                        if ( (!gravity[playerIndex] && !hasJumped[playerIndex])
+                            || (newSpherePosition.Y < newHeight + 10))
                         {
-                            newSpherePosition = spherePosition;
-                        }
-                        else if (newSpherePosition.Y < newHeight + 10)
-                        {
+                            Vector3 tempPosition = newSpherePosition;
+                            tempPosition.X -= currentVelocity.X;
+                            float tempHeight;
+                            heightMapInfo.GetHeightAndNormal(tempPosition, out tempHeight, out newNormal);
+                            if (tempHeight == newHeight)
+                            {
+                                currentVelocity = Vector3.Reflect(currentVelocity, Vector3.UnitZ);
+                            }
+                            else
+                            {
+                                currentVelocity = Vector3.Reflect(currentVelocity, Vector3.UnitX);
+                            }
                             newSpherePosition = spherePosition;
                         }
                     }
