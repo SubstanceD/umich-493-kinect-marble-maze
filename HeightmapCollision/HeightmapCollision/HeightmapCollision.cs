@@ -298,11 +298,11 @@ namespace HeightmapCollision
             position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("ExitButton").Width / 2, 475,
                 Content.Load<Texture2D>("ExitButton").Width, Content.Load<Texture2D>("ExitButtonHi").Height);
 
-            exitButton = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.EXIT,1);
+            exitButton = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.EXIT,2);
 
             position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("HelpButton").Width / 2, 275, 
                 Content.Load<Texture2D>("HelpButton").Width, Content.Load<Texture2D>("HelpButton").Height);
-            helpButton = new Button(position, Content.Load<Texture2D>("HelpButton"), Content.Load<Texture2D>("HelpButtonHi"), GameState.HIGHSCORES);
+            helpButton = new Button(position, Content.Load<Texture2D>("HelpButton"), Content.Load<Texture2D>("HelpButtonHi"), GameState.HIGHSCORES,1);
 
             //position = new Rectangle(0, 200, 200, 200);
             //highScoresButton = new Button(position, Content.Load<Texture2D>("NextLevel"), Content.Load<Texture2D>("NextLevelHi"), GameState.HIGHSCORES);
@@ -509,15 +509,26 @@ namespace HeightmapCollision
                     }
                     break;
                 case GameState.MAINMENU:
-                    if (up || down)
+                    if (up || upP2)
                     {
-                        if (mainNum == 1)
+                        if (mainNum == 0)
+                        {
+                            mainNum = 2;
+                        }
+                        else
+                        {
+                            mainNum--;
+                        }
+                    }
+                    if (down || downP2)
+                    {
+                        if (mainNum == 2)
                         {
                             mainNum = 0;
                         }
                         else
                         {
-                            mainNum = 1;
+                            mainNum++;
                         }
                     }
                     UpdateMainMenu(gameTime);
@@ -898,8 +909,10 @@ namespace HeightmapCollision
                     exitButton.Draw(spriteBatch);
                     helpButton.Draw(spriteBatch);
                     //highScoresButton.Draw(spriteBatch);
+#if !XBOX360
                     spriteBatch.Draw(cursor, cursorPos, Color.White);
                     spriteBatch.Draw(hand, handPosP1, Color.White);
+#endif
                     spriteBatch.End();
                     break;
                 case GameState.BETWEENLEVELS:
@@ -910,8 +923,10 @@ namespace HeightmapCollision
                     onePlayerButton.Draw(spriteBatch);
                     twoPlayerButton.Draw(spriteBatch);
                     cancelButton.Draw(spriteBatch);
+#if !XBOX360
                     spriteBatch.Draw(cursor, cursorPos, Color.White);
                     spriteBatch.Draw(hand, handPosP1, Color.White);
+#endif
                     spriteBatch.End();
                     break;
                 case GameState.FINISH:
@@ -958,9 +973,10 @@ namespace HeightmapCollision
 
                 spriteBatch.DrawString(font, "Player 1 Total Time: " + formatString(p1TotalTime.ToString()), new Vector2(425, 300), Color.Black);
                 spriteBatch.DrawString(font, "Player 1 Level Time: " + formatString(p1LevelTime.ToString()), new Vector2(425, 350), Color.Black);
-
+#if !XBOX360
                 spriteBatch.Draw(cursor, cursorPos, Color.White);
                 spriteBatch.Draw(hand, handPosP1, Color.White);
+#endif
                 spriteBatch.End();
             }
             else
@@ -975,10 +991,11 @@ namespace HeightmapCollision
                 spriteBatch.DrawString(font, "Player 1 Level Time: " + formatString(p1LevelTime.ToString()), new Vector2(rightViewport.X + 125, 350), Color.Black);
                 spriteBatch.DrawString(font, "Player 2 Total Time: " + formatString(p2TotalTime.ToString()), new Vector2(125, 300), Color.Black);
                 spriteBatch.DrawString(font, "Player 2 Level Time: " + formatString(p2LevelTime.ToString()), new Vector2(125, 350), Color.Black);
-
+#if !XBOX360
                 spriteBatch.Draw(cursor, cursorPos, Color.White);
                 spriteBatch.Draw(hand, handPosP1, Color.White);
                 spriteBatch.Draw(hand, handPosP2, Color.White);
+#endif
                 spriteBatch.End();
             }
 
