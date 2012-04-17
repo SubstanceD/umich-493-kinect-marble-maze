@@ -51,7 +51,7 @@ namespace HeightmapCollision
 
     public enum GameState
     {
-        MAINMENU, INGAME, NOCHANGE, EXIT, INGAME2P, SELECTPLAYERS, FINISH, BETWEENLEVELS, READY
+        MAINMENU, INGAME, NOCHANGE, EXIT, INGAME2P, SELECTPLAYERS, FINISH, BETWEENLEVELS, READY, HIGHSCORES
     };
 
     public class HeightmapCollisionGame : Microsoft.Xna.Framework.Game
@@ -93,11 +93,10 @@ namespace HeightmapCollision
 
         //main menu buttons
         Button startButton;
+        Button helpButton;
+        Button highScoresButton;
         Button exitButton;
         
-        Rectangle startPos;
-        Rectangle exitPos;
-
         //selectplayers buttons
         Button onePlayerButton;
         Button twoPlayerButton;
@@ -207,6 +206,7 @@ namespace HeightmapCollision
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferHeight = 720;
             graphics.PreferredBackBufferWidth = 1280;
+            //graphics.IsFullScreen = true;
             input = new InputHandler(graphics);
             Content.RootDirectory = "Content";
             gravity = new bool[2];
@@ -281,16 +281,24 @@ namespace HeightmapCollision
             hand = Content.Load<Texture2D>("Cursor");
 
             //mainmenubuttons
-            startPos = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("PlayButton").Width / 2, GraphicsDevice.Viewport.Height / 4 - Content.Load<Texture2D>("PlayButtonHi").Height/2,
+            Rectangle position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("PlayButton").Width / 2, GraphicsDevice.Viewport.Height / 4 - Content.Load<Texture2D>("PlayButtonHi").Height / 2,
                 Content.Load<Texture2D>("PlayButton").Width, Content.Load<Texture2D>("PlayButtonHi").Height);
-            exitPos = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("ExitButton").Width / 2, 2*GraphicsDevice.Viewport.Height / 3 - Content.Load<Texture2D>("ExitButtonHi").Height / 2,
+            startButton = new Button(position, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.SELECTPLAYERS, 0);
+
+            position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("ExitButton").Width / 2, 2*GraphicsDevice.Viewport.Height / 3 - Content.Load<Texture2D>("ExitButtonHi").Height / 2,
                 Content.Load<Texture2D>("ExitButton").Width, Content.Load<Texture2D>("ExitButtonHi").Height);
 
-            exitButton = new Button(exitPos, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.EXIT,1);
-            startButton = new Button(startPos, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.SELECTPLAYERS,0);
+            exitButton = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.EXIT,1);
 
+            position = new Rectangle(0, 0, 200, 200);
+            helpButton = new Button(position, Content.Load<Texture2D>("MainMenu"), Content.Load<Texture2D>("MainMenuHi"), GameState.HIGHSCORES);
+
+            position = new Rectangle(0, 200, 200, 200);
+            highScoresButton = new Button(position, Content.Load<Texture2D>("NextLevel"), Content.Load<Texture2D>("NextLevelHi"), GameState.HIGHSCORES);
+
+            
             //selectPlayers buttons
-            Rectangle position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("OnePlayer").Width / 2, 75, 400, 200);
+            position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("OnePlayer").Width / 2, 75, 400, 200);
             onePlayerButton = new Button(position, Content.Load<Texture2D>("OnePlayer"), Content.Load<Texture2D>("OnePlayerHi"), GameState.INGAME,0);
             position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("OnePlayer").Width / 2, 275, 400, 200);
             twoPlayerButton = new Button(position, Content.Load<Texture2D>("TwoPlayer"), Content.Load<Texture2D>("TwoPlayerHi"), GameState.INGAME2P,1);
@@ -529,11 +537,7 @@ namespace HeightmapCollision
                     break;
                 case GameState.FINISH:
                     UpdateFinishGame(gameTime);
-                    currentLevel = 0;
-                    loadLevel();
-                    System.Diagnostics.Process.Start("http://www.google.com");
                     
-                    currentState = GameState.MAINMENU;
                     break;
                 default:
                     //error message here
@@ -691,6 +695,21 @@ namespace HeightmapCollision
                 return;
             }
 
+            buttonState = helpButton.Update(gameTime, input.getMouse(), handPosP1, mainNum);
+            if (buttonState != GameState.NOCHANGE)
+            {
+                System.Diagnostics.Process.Start("http://www.google.com");
+                return;
+            }
+
+            buttonState = highScoresButton.Update(gameTime, input.getMouse(), handPosP1, mainNum);
+
+            if (buttonState != GameState.NOCHANGE)
+            {
+                currentState = buttonState;
+                return;
+            }
+
             cursorPos = new Vector2(input.getMouse().X, input.getMouse().Y);
         }
 
@@ -807,6 +826,8 @@ namespace HeightmapCollision
                     spriteBatch.Begin();
                     startButton.Draw(spriteBatch);
                     exitButton.Draw(spriteBatch);
+                    helpButton.Draw(spriteBatch);
+                    highScoresButton.Draw(spriteBatch);
                     spriteBatch.Draw(cursor, cursorPos, Color.White);
                     spriteBatch.Draw(hand, handPosP1, Color.White);
                     spriteBatch.End();
