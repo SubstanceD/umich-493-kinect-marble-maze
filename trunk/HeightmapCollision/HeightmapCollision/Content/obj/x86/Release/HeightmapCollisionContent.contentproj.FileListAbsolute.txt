@@ -1,3 +1,4 @@
 C:\Users\bryan\Downloads\HeightmapCollisionSample_4_0\HeightmapCollision\HeightmapCollision\Content\obj\x86\Release\HeightmapCollisionContent.contentprojResolveAssemblyReference.cache
 C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\kinect-marble-maze\HeightmapCollision\HeightmapCollision\Content\obj\x86\Release\HeightmapCollisionContent.contentprojResolveAssemblyReference.cache
 C:\Users\Luminous\Documents\Visual Studio 2010\Projects\HeightmapCollision (Windows)(1)\HeightmapCollision\HeightmapCollision\Content\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\bryan\Dropbox\Michigan\Winter12\EECS493\KinectMarbleMaze\HeightmapCollision\HeightmapCollision\Content\obj\x86\Release\HeightmapCollisionContent.contentprojResolveAssemblyReference.cache
