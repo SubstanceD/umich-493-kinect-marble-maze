@@ -1043,6 +1043,16 @@ namespace HeightmapCollision
             }
             else
             {
+                Vector3 tempPosition = newSpherePosition;
+                tempPosition.X -= currentVelocity.X;
+                if (heightMapInfo.IsOnHeightmap(tempPosition))
+                {
+                    currentVelocity = Vector3.Reflect(currentVelocity, Vector3.UnitX);
+                }
+                else
+                {
+                    currentVelocity = Vector3.Reflect(currentVelocity, Vector3.UnitZ);
+                }
                 newSpherePosition = spherePosition;
             }
 
