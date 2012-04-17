@@ -355,7 +355,7 @@ namespace HeightmapCollision
         /// </summary>
         protected override void Update(GameTime gameTime)
         {
-            input.update();
+            input.update(gameTime);
 
             switch (currentState)
             {
