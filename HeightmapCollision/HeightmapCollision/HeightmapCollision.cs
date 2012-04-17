@@ -68,7 +68,7 @@ namespace HeightmapCollision
         // and when computing how far the sphere has rolled.
         const float SphereRadius = 12.0f;
 
-        const float FrictionConst = .04f;
+        const float FrictionConst = .06f;
 
         //value used for falling ball
         const float gravityConst = 2.0f;
@@ -300,14 +300,14 @@ namespace HeightmapCollision
 
             //also need buttons for the two player version
             position = new Rectangle(0, 0, Content.Load<Texture2D>("PlayButton").Width, Content.Load<Texture2D>("PlayButtonHi").Height);
-            readyButtonP1 = new Button(position, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.INGAME);
+            readyButtonP2 = new Button(position, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.INGAME);
             position = new Rectangle(0, 400, 200, 200);
-            mainMenuButtonP1 = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.MAINMENU);
+            mainMenuButtonP2 = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.MAINMENU);
 
             position = new Rectangle(0 + leftViewport.Width, 0, Content.Load<Texture2D>("PlayButton").Width, Content.Load<Texture2D>("PlayButtonHi").Height);
-            readyButtonP2 = new Button(position, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.INGAME);
+            readyButtonP1 = new Button(position, Content.Load<Texture2D>("PlayButton"), Content.Load<Texture2D>("PlayButtonHi"), GameState.INGAME);
             position = new Rectangle(0 + leftViewport.Width, 400, 200, 200);
-            mainMenuButtonP2 = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.MAINMENU);
+            mainMenuButtonP1 = new Button(position, Content.Load<Texture2D>("ExitButton"), Content.Load<Texture2D>("ExitButtonHi"), GameState.MAINMENU);
 
 
             loadLevel();
@@ -368,7 +368,7 @@ namespace HeightmapCollision
                         p1LevelTime = gameTime.TotalGameTime - levelStart;
                     }
                    // Console.WriteLine("Ball position is: {0}", p1Position.ToString());
-                    if (isOnFinish(p1Position))
+                    if (isOnFinish(p1Position) && !p1HasFinished)
                     {
                         p1TotalTime += p1LevelTime;
                         p1HasFinished = true;
@@ -404,12 +404,12 @@ namespace HeightmapCollision
                         p2LevelTime = gameTime.TotalGameTime - levelStart;
                     }
 
-                    if (isOnFinish(p1Position))
+                    if (isOnFinish(p1Position) && !p1HasFinished)
                     {
                         p1TotalTime += p1LevelTime;
                         p1HasFinished = true;
                     }
-                    if (isOnFinish(p2Position))
+                    if (isOnFinish(p2Position) && !p2HasFinished)
                     {
                         p2TotalTime += p2LevelTime;
                         p2HasFinished = true;
@@ -738,7 +738,7 @@ namespace HeightmapCollision
                 spriteBatch.Begin();
                 readyButton.Draw(spriteBatch);
                 mainMenuButton.Draw(spriteBatch);
-                spriteBatch.DrawString(font, p1TotalTime.ToString(), new Vector2(0, 300), Color.White);
+                spriteBatch.DrawString(font, p1TotalTime.ToString("mm\\:ss\\.ff"), new Vector2(0, 300), Color.White);
                 spriteBatch.Draw(cursor, cursorPos, Color.White);
                 spriteBatch.Draw(hand, handPosP1, Color.White);
                 spriteBatch.End();
@@ -750,8 +750,13 @@ namespace HeightmapCollision
                 mainMenuButtonP1.Draw(spriteBatch);
                 readyButtonP2.Draw(spriteBatch);
                 mainMenuButtonP2.Draw(spriteBatch);
+
+                spriteBatch.DrawString(font, p1TotalTime.ToString("mm\\:ss\\.ff"), new Vector2(rightViewport.X, 300), Color.White);
+                spriteBatch.DrawString(font, p2TotalTime.ToString("mm\\:ss\\.ff"), new Vector2(leftViewport.X, 300), Color.White);
+
                 spriteBatch.Draw(cursor, cursorPos, Color.White);
                 spriteBatch.Draw(hand, handPosP1, Color.White);
+                spriteBatch.Draw(hand, handPosP2, Color.White);
                 spriteBatch.End();
             }
         }
