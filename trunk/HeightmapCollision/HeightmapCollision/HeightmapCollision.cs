@@ -406,13 +406,18 @@ namespace HeightmapCollision
             {
                 mouseFocus = true;
             }
-            
-            
+
+            bool newup = false;
+            bool newdown = false;
+            bool newupP2 = false;
+            bool newdownP2 = false;
+
             if ((currentState != GameState.INGAME) && (currentState != GameState.INGAME2P))
             {
                 if (!up && (input.isNewKeyPress(Keys.Up) ||
                     (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y > .1)))
                 {
+                    newup = true;
                     up = true;
                     mouseFocus = false;
                 }
@@ -425,6 +430,7 @@ namespace HeightmapCollision
                     (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y < -.1)))
                 {
                     down = true;
+                    newdown = true;
                     mouseFocus = false;
                 }
                 else if (down && !(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y < -.1))
@@ -432,15 +438,28 @@ namespace HeightmapCollision
                     down = false;
                 }
 
-                if ((ButtonState.Pressed == GamePad.GetState(PlayerIndex.Two).DPad.Up) ||
-                (GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.Y > .1))
+                if (!upP2 && (input.isNewKeyPress(Keys.W) ||
+                (GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.Y > .1)))
                 {
                     upP2 = true;
+                    newupP2 = true;
+                    mouseFocus = false;
                 }
-                if ((ButtonState.Pressed == GamePad.GetState(PlayerIndex.Two).DPad.Down) ||
-                    (GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.Y < -.1))
+                else if (upP2 && !(GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.Y > .1))
+                {
+                    upP2 = false;
+                }
+
+                if (!downP2 && (input.isNewKeyPress(Keys.S) ||
+                    (GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.Y < -.1)))
                 {
                     downP2 = true;
+                    newdownP2 = true;
+                    mouseFocus = false;
+                }
+                else if (downP2 && !(GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.Y < -.1))
+                {
+                    downP2 = false;
                 }
             }
             else
@@ -529,7 +548,7 @@ namespace HeightmapCollision
                     }
                     break;
                 case GameState.MAINMENU:
-                    if (up || upP2)
+                    if (newup || newupP2)
                     {
                         if (mainNum == 0)
                         {
@@ -540,7 +559,7 @@ namespace HeightmapCollision
                             mainNum--;
                         }
                     }
-                    if (down || downP2)
+                    if (newdown || newdownP2)
                     {
                         if (mainNum == 2)
                         {
@@ -554,7 +573,7 @@ namespace HeightmapCollision
                     UpdateMainMenu(gameTime);
                     break;
                 case GameState.SELECTPLAYERS:
-                    if (up || upP2)
+                    if (newup || newupP2)
                     {
                         if (levelNum == 0)
                         {
@@ -565,7 +584,7 @@ namespace HeightmapCollision
                             levelNum--;
                         }
                     }
-                    if (down || downP2)
+                    if (newdown || newdownP2)
                     {
                         if (levelNum == 2)
                         {
@@ -579,7 +598,7 @@ namespace HeightmapCollision
                     UpdatePlayerSelect(gameTime);
                     break;
                 case GameState.BETWEENLEVELS:
-                    if (up || down)
+                    if (newup || newdown)
                     {
                         if (betweenNum == 1)
                         {
@@ -590,7 +609,7 @@ namespace HeightmapCollision
                             betweenNum = 1;
                         }
                     }
-                    if (upP2 || downP2)
+                    if (newupP2 || newdownP2)
                     {
                         if (betweenNumP2 == 1)
                         {
