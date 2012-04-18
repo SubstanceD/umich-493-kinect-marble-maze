@@ -24,22 +24,23 @@ namespace HeightmapCollision
         Skeleton currentSkeleton = null;
         Skeleton skeletonPlayerOne = null;
         Skeleton skeletonPlayerTwo = null;
-        #endif       
-        int IDPlayerOne = -1;
-        int IDPlayerTwo = -1;
-        float armLength;
-        float armLengthP1;
-        float armLengthP2;
-        GamePadState gp;
-        GamePadState gp2;
-        GameTime currentTime;
         float handUpTime;
         float handUpTimeP1;
         float handUpTimeP2;
         bool handUpP1 = false;
         bool handUpP2 = false;
         bool handUp;
+        int IDPlayerOne = -1;
+        int IDPlayerTwo = -1;
+        
+        float armLengthP1;
+        float armLengthP2;
 
+        #endif       
+        GamePadState gp;
+        GamePadState gp2;
+        GameTime currentTime;
+        float armLength;
         bool skeletonsValid = false;
 
 
