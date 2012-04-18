@@ -195,6 +195,7 @@ namespace HeightmapCollision
         bool down = false;
         bool upP2 = false;
         bool downP2 = false;
+        bool justStarted = true;
 
         public int currentLevel;
         static public int numLevels = 4;
@@ -550,24 +551,38 @@ namespace HeightmapCollision
                 case GameState.MAINMENU:
                     if (newup || newupP2)
                     {
-                        if (mainNum == 0)
+                        if (!justStarted)
                         {
-                            mainNum = 2;
+                            if (mainNum == 0)
+                            {
+                                mainNum = 2;
+                            }
+                            else
+                            {
+                                mainNum--;
+                            }
                         }
                         else
                         {
-                            mainNum--;
+                            justStarted = false;
                         }
                     }
                     if (newdown || newdownP2)
                     {
-                        if (mainNum == 2)
+                        if (!justStarted)
                         {
-                            mainNum = 0;
+                            if (mainNum == 2)
+                            {
+                                mainNum = 0;
+                            }
+                            else
+                            {
+                                mainNum++;
+                            }
                         }
                         else
                         {
-                            mainNum++;
+                            justStarted = false;
                         }
                     }
                     UpdateMainMenu(gameTime);
