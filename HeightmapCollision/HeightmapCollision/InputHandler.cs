@@ -40,7 +40,7 @@ namespace HeightmapCollision
         GamePadState gp;
         GamePadState gp2;
         GameTime currentTime;
-        float armLength;
+        float armLength = 0;
         bool skeletonsValid = false;
 
 
@@ -310,7 +310,7 @@ namespace HeightmapCollision
                 Joint shoulder = currentSkeleton.Joints[JointType.ShoulderCenter];
                 Joint spine = currentSkeleton.Joints[JointType.Spine];
 
-                if (shoulder.Position.Z - 0.07f  > spine.Position.Z)
+                if (shoulder.Position.Z - 0.1f  > spine.Position.Z)
                     return true;
             }
 #endif

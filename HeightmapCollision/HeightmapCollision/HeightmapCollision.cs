@@ -938,26 +938,44 @@ namespace HeightmapCollision
 
                     Viewport original = graphics.GraphicsDevice.Viewport;
                     //player one
-                    graphics.GraphicsDevice.Viewport = rightViewport;
-                    DrawModel(terrain, Matrix.Identity, p1View, p1Projection);
-                    DrawModel(sphere, p1RollingMatrix *
-                        Matrix.CreateTranslation(p1Position), p1View, p1Projection);
-                    DrawModel(sphere, p2RollingMatrix *
-                        Matrix.CreateTranslation(p2Position), p1View, p1Projection);
+                    if (!p1HasFinished)
+                    {
+                        graphics.GraphicsDevice.Viewport = rightViewport;
+                        DrawModel(terrain, Matrix.Identity, p1View, p1Projection);
+                        DrawModel(sphere, p1RollingMatrix *
+                            Matrix.CreateTranslation(p1Position), p1View, p1Projection);
+                        DrawModel(sphere, p2RollingMatrix *
+                            Matrix.CreateTranslation(p2Position), p1View, p1Projection);
+                    }
                     //player two
-                    graphics.GraphicsDevice.Viewport = leftViewport;
-                    DrawModel(terrain, Matrix.Identity, p2View, p2Projection);
-                    DrawModel(sphere, p2RollingMatrix *
-                        Matrix.CreateTranslation(p2Position), p2View, p2Projection);
-                    DrawModel(sphere, p1RollingMatrix *
-                        Matrix.CreateTranslation(p1Position), p2View, p2Projection);
+                    if (!p2HasFinished)
+                    {
+                        graphics.GraphicsDevice.Viewport = leftViewport;
+                        DrawModel(terrain, Matrix.Identity, p2View, p2Projection);
+                        DrawModel(sphere, p2RollingMatrix *
+                            Matrix.CreateTranslation(p2Position), p2View, p2Projection);
+                        DrawModel(sphere, p1RollingMatrix *
+                            Matrix.CreateTranslation(p1Position), p2View, p2Projection);
+                    }
 
                     graphics.GraphicsDevice.Viewport = original;
 
                     spriteBatch.Begin();
+                    if (!p1HasFinished)
+                        spriteBatch.DrawString(font, formatString(p1LevelTime.ToString()), new Vector2(rightViewport.X, rightViewport.Y), Color.White);
+                    else
+                    {
+                        spriteBatch.DrawString(font, "Level Time: " + formatString(p1LevelTime.ToString()), new Vector2(rightViewport.X + 175, rightViewport.Y + rightViewport.Height / 2), Color.Black);
+                        spriteBatch.DrawString(font, "Congratulations!", new Vector2(rightViewport.X + 200, rightViewport.Y + rightViewport.Height* 3 / 8), Color.Black);
+                    }
 
-                    spriteBatch.DrawString(font, formatString(p1LevelTime.ToString()), new Vector2(rightViewport.X, rightViewport.Y), Color.White);
-                    spriteBatch.DrawString(font, formatString(p2LevelTime.ToString()), new Vector2(leftViewport.X, leftViewport.Y), Color.White);
+                    if (!p2HasFinished)
+                        spriteBatch.DrawString(font, formatString(p2LevelTime.ToString()), new Vector2(leftViewport.X, leftViewport.Y), Color.White);
+                    else
+                    {
+                        spriteBatch.DrawString(font, "Level Time: " + formatString(p2LevelTime.ToString()), new Vector2(leftViewport.X + 175, leftViewport.Y + leftViewport.Height / 2), Color.Black);
+                        spriteBatch.DrawString(font, "Congratulations!", new Vector2(leftViewport.X + 200, leftViewport.Y + leftViewport.Height * 3 / 8), Color.Black);
+                    }
                     spriteBatch.End();
                     
                     // If there was any alpha blended translucent geometry in
@@ -1016,12 +1034,12 @@ namespace HeightmapCollision
                 case GameState.HELP:
                     spriteBatch.Begin();
                     mainMenuButtonFinish.Draw(spriteBatch);
-                    spriteBatch.DrawString(font, "Controls", new Vector2(475, 50), Color.White);
-                    spriteBatch.DrawString(font, "Move: Left analog stick", new Vector2(475, 150), Color.White);
-                    spriteBatch.DrawString(font, "Turn: Right analog stick", new Vector2(475, 200), Color.White);
-                    spriteBatch.DrawString(font, "Jump: A button", new Vector2(475, 250), Color.White);
-                    spriteBatch.DrawString(font, "Pause: Start button", new Vector2(475, 350), Color.White);
-                    spriteBatch.DrawString(font, "Reset: Y button", new Vector2(475, 300), Color.White);
+                    spriteBatch.DrawString(font, "Controls", new Vector2(475, 50), Color.Black);
+                    spriteBatch.DrawString(font, "Move: Left analog stick", new Vector2(475, 150), Color.Black);
+                    spriteBatch.DrawString(font, "Turn: Right analog stick", new Vector2(475, 200), Color.Black);
+                    spriteBatch.DrawString(font, "Jump: A button", new Vector2(475, 250), Color.Black);
+                    spriteBatch.DrawString(font, "Pause: Start button", new Vector2(475, 350), Color.Black);
+                    spriteBatch.DrawString(font, "Reset: Y button", new Vector2(475, 300), Color.Black);
                     spriteBatch.End();
                     break;
                 default:
