@@ -902,7 +902,7 @@ namespace HeightmapCollision
                     DrawModel(terrain, Matrix.Identity, p1View, projectionMatrix);
                     DrawModel(sphere, p1RollingMatrix * 
                         Matrix.CreateTranslation(p1Position), p1View, projectionMatrix);
-                    DrawModel(flag, Matrix.CreateTranslation(flagPosition), p1View, projectionMatrix);
+                    //DrawModel(flag, Matrix.CreateTranslation(flagPosition), p1View, projectionMatrix);
 
                     spriteBatch.Begin();
                     spriteBatch.DrawString(font, formatString(p1LevelTime.ToString()), new Vector2(0, 0), Color.White);
