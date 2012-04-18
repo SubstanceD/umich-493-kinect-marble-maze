@@ -18,9 +18,11 @@ namespace HeightmapCollision
 
 
         bool selected;
+        bool gamePadSelected = false;
         bool hovering;
         int buttonNum;
         double hover_start;
+        private bool keyBoardSelected = false;
 
         public Button(Rectangle pos, Texture2D normal, Texture2D highlighted, GameState transition)
         {
@@ -42,7 +44,7 @@ namespace HeightmapCollision
         }
 
         public GameState Update(GameTime gameTime, MouseState mouseState, Vector2 handPosition, 
-            int curNum, PlayerIndex player)
+            int curNum, PlayerIndex player, bool mouseFocus)
         {
             bool mouseHover = false;
             bool handHover = false;
@@ -65,19 +67,40 @@ namespace HeightmapCollision
             else
             {
                 selected = false;
-                if (GamePad.GetState(player).IsConnected)
+                if (!mouseFocus)
                 {
                     if (curNum == buttonNum)
                     {
                         mouseHover = true;
                         current = pressed;
-                        bool buttonPressed = false;
-                        while (GamePad.GetState(player).Buttons.A == ButtonState.Pressed)
+                        Keys selectKey;
+                        if (player == PlayerIndex.One)
                         {
-                            buttonPressed = true;
+                            selectKey = Keys.RightShift;
                         }
-                        if (buttonPressed)
+                        else
+                            selectKey = Keys.F;
+
+
+                        if (!gamePadSelected && GamePad.GetState(player).Buttons.A == ButtonState.Pressed)
                         {
+                            gamePadSelected = true;
+                        }
+
+                        if (gamePadSelected && GamePad.GetState(player).Buttons.A == ButtonState.Released)
+                        {
+                            gamePadSelected = false;
+                            return transitionTo;
+                        }
+
+                        if (!keyBoardSelected && Keyboard.GetState().IsKeyDown(selectKey))
+                        {
+                            keyBoardSelected = true;
+                        }
+
+                        if (keyBoardSelected && Keyboard.GetState().IsKeyUp(selectKey))
+                        {
+                            keyBoardSelected = false;
                             return transitionTo;
                         }
                     }
