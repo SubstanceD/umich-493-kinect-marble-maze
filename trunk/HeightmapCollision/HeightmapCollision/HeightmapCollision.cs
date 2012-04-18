@@ -203,7 +203,7 @@ namespace HeightmapCollision
         public static finishValues[] levelValues = new finishValues[]
         {
             new finishValues(2500, 2800, 2500, 2800), //Level One
-            new finishValues(-3150, -2850, 2500, 2800), // Level Two
+            new finishValues(-3250, -2650, 2450, 2900), // Level Two
             new finishValues(2600, 2750, 2600, 2750), //Level Three
             new finishValues(-3220,-2601,-3812,-3193, new Vector3(-3073, 0, 1847)) // Level Four
             //This is the sphere position approximated
@@ -240,7 +240,7 @@ namespace HeightmapCollision
 
         bool isOnFinish(Vector3 s)
         {
-            //Console.WriteLine("X: {0} Z: {1}", spherePosition.X, spherePosition.Z);
+            Console.WriteLine("X: {0} Z: {1}", spherePosition.X, spherePosition.Z);
             if ((s.X <= levelValues[currentLevel].xMax) &&
                 (s.X >= levelValues[currentLevel].xMin) &&
                 (s.Z <= levelValues[currentLevel].yMax) &&
@@ -352,7 +352,7 @@ namespace HeightmapCollision
 
             //finish buttons
             position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("MainMenu").Width / 2, 475, Content.Load<Texture2D>("MainMenu").Width, Content.Load<Texture2D>("MainMenu").Height);
-            mainMenuButtonFinish = new Button(position, Content.Load<Texture2D>("MainMenu"), Content.Load<Texture2D>("MainMenuHi"), GameState.MAINMENU, 1);
+            mainMenuButtonFinish = new Button(position, Content.Load<Texture2D>("MainMenu"), Content.Load<Texture2D>("MainMenuHi"), GameState.MAINMENU, 0);
             finishGraphicPosition = new Rectangle(GraphicsDevice.Viewport.Width / 2 - finishGraphic.Width / 2, 0, finishGraphic.Width, finishGraphic.Height);
 
 
