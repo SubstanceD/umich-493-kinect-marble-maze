@@ -1016,12 +1016,12 @@ namespace HeightmapCollision
                 case GameState.HELP:
                     spriteBatch.Begin();
                     mainMenuButtonFinish.Draw(spriteBatch);
-                    spriteBatch.DrawString(font, "Controls", new Vector2(200, 50), Color.White);
-                    spriteBatch.DrawString(font, "Move: Left analog stick", new Vector2(250, 150), Color.White);
-                    spriteBatch.DrawString(font, "Turn: Right analog stick", new Vector2(300, 200), Color.White);
-                    spriteBatch.DrawString(font, "Jump: A button", new Vector2(350, 250), Color.White);
-                    spriteBatch.DrawString(font, "Pause: Start button", new Vector2(450, 350), Color.White);
-                    spriteBatch.DrawString(font, "Reset: Y button", new Vector2(400, 300), Color.White);
+                    spriteBatch.DrawString(font, "Controls", new Vector2(475, 50), Color.White);
+                    spriteBatch.DrawString(font, "Move: Left analog stick", new Vector2(475, 150), Color.White);
+                    spriteBatch.DrawString(font, "Turn: Right analog stick", new Vector2(475, 200), Color.White);
+                    spriteBatch.DrawString(font, "Jump: A button", new Vector2(475, 250), Color.White);
+                    spriteBatch.DrawString(font, "Pause: Start button", new Vector2(475, 350), Color.White);
+                    spriteBatch.DrawString(font, "Reset: Y button", new Vector2(475, 300), Color.White);
                     spriteBatch.End();
                     break;
                 default:
