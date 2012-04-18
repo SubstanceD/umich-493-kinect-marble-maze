@@ -219,7 +219,7 @@ namespace HeightmapCollision
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferHeight = 720;
             graphics.PreferredBackBufferWidth = 1280;
-            //graphics.IsFullScreen = true;
+            graphics.IsFullScreen = true;
             input = new InputHandler(graphics);
             Content.RootDirectory = "Content";
             gravity = new bool[2];
@@ -240,7 +240,7 @@ namespace HeightmapCollision
 
         bool isOnFinish(Vector3 s)
         {
-            Console.WriteLine("X: {0} Z: {1}", spherePosition.X, spherePosition.Z);
+            //Console.WriteLine("X: {0} Z: {1}", spherePosition.X, spherePosition.Z);
             if ((s.X <= levelValues[currentLevel].xMax) &&
                 (s.X >= levelValues[currentLevel].xMin) &&
                 (s.Z <= levelValues[currentLevel].yMax) &&
