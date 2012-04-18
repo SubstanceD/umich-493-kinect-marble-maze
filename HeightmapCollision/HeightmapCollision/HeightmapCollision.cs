@@ -51,7 +51,7 @@ namespace HeightmapCollision
 
     public enum GameState
     {
-        MAINMENU, INGAME, NOCHANGE, EXIT, INGAME2P, SELECTPLAYERS, FINISH, BETWEENLEVELS, READY, HIGHSCORES
+        MAINMENU, INGAME, NOCHANGE, EXIT, INGAME2P, SELECTPLAYERS, FINISH, BETWEENLEVELS, READY, HIGHSCORES, HELP
     };
 
     public class HeightmapCollisionGame : Microsoft.Xna.Framework.Game
@@ -309,7 +309,7 @@ namespace HeightmapCollision
 
             position = new Rectangle(GraphicsDevice.Viewport.Width / 2 - Content.Load<Texture2D>("HelpButton").Width / 2, 275, 
                 Content.Load<Texture2D>("HelpButton").Width, Content.Load<Texture2D>("HelpButton").Height);
-            helpButton = new Button(position, Content.Load<Texture2D>("HelpButton"), Content.Load<Texture2D>("HelpButtonHi"), GameState.HIGHSCORES,1);
+            helpButton = new Button(position, Content.Load<Texture2D>("HelpButton"), Content.Load<Texture2D>("HelpButtonHi"), GameState.HELP,1);
 
             //position = new Rectangle(0, 200, 200, 200);
             //highScoresButton = new Button(position, Content.Load<Texture2D>("NextLevel"), Content.Load<Texture2D>("NextLevelHi"), GameState.HIGHSCORES);
@@ -644,6 +644,9 @@ namespace HeightmapCollision
                     UpdateFinishGame(gameTime);
                     
                     break;
+                case GameState.HELP:
+                    UpdateFinishGame(gameTime);
+                    break;
                 default:
                     //error message here
                     break;
@@ -809,13 +812,16 @@ namespace HeightmapCollision
             }
 
             buttonState = helpButton.Update(gameTime, input.getMouse(), handPosP1, mainNum, PlayerIndex.One, mouseFocus);
-#if !XBOX360
             if (buttonState != GameState.NOCHANGE)
             {
-                System.Diagnostics.Process.Start("http://www.google.com");
-                return;
-            }
+#if XBOX360
+                currentState = buttonState;
+#else
+                System.Diagnostics.Process.Start("http://www-personal.umich.edu/~mjbader/instructions.html");
 #endif
+                return;
+
+            }
             //buttonState = highScoresButton.Update(gameTime, input.getMouse(), handPosP1, mainNum);
 
             //if (buttonState != GameState.NOCHANGE)
@@ -1007,7 +1013,17 @@ namespace HeightmapCollision
 #endif
                     spriteBatch.End();
                     break;
-
+                case GameState.HELP:
+                    spriteBatch.Begin();
+                    mainMenuButtonFinish.Draw(spriteBatch);
+                    spriteBatch.DrawString(font, "Controls", new Vector2(0, 50), Color.White);
+                    spriteBatch.DrawString(font, "Move: Left analog stick", new Vector2(0, 150), Color.White);
+                    spriteBatch.DrawString(font, "Turn: Right analog stick", new Vector2(0, 200), Color.White);
+                    spriteBatch.DrawString(font, "Jump: A button", new Vector2(0, 250), Color.White);
+                    spriteBatch.DrawString(font, "Pause: Start button", new Vector2(0, 350), Color.White);
+                    spriteBatch.DrawString(font, "Reset: Y button", new Vector2(0, 300), Color.White);
+                    spriteBatch.End();
+                    break;
                 default:
                     //error message
                     break;
