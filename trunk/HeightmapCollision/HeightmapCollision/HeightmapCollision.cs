@@ -190,6 +190,12 @@ namespace HeightmapCollision
         int betweenNum;
         int betweenNumP2;
 
+        bool mouseFocus = true;
+        bool up = false;
+        bool down = false;
+        bool upP2 = false;
+        bool downP2 = false;
+
         public int currentLevel;
         static public int numLevels = 4;
 
@@ -395,29 +401,43 @@ namespace HeightmapCollision
         protected override void Update(GameTime gameTime)
         {
             input.update(gameTime);
+
+            if (input.getMouse().LeftButton == ButtonState.Pressed)
+            {
+                mouseFocus = true;
+            }
             
-            bool up = false;
-            bool down = false;
-            bool upP2 = false;
-            bool downP2 = false;
+            
             if ((currentState != GameState.INGAME) && (currentState != GameState.INGAME2P))
             {
-                while ((ButtonState.Pressed == GamePad.GetState(PlayerIndex.One).DPad.Up) ||
-                    (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y > .1))
+                if (!up && (input.isNewKeyPress(Keys.Up) ||
+                    (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y > .1)))
                 {
                     up = true;
+                    mouseFocus = false;
                 }
-                while ((ButtonState.Pressed == GamePad.GetState(PlayerIndex.One).DPad.Down) ||
-                    (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y < -.1))
+                else if (up && !(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y > .1))
+                {
+                    up = false;
+                }
+
+                if (!down && (input.isNewKeyPress(Keys.Down) ||
+                    (GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y < -.1)))
                 {
                     down = true;
+                    mouseFocus = false;
                 }
-                while ((ButtonState.Pressed == GamePad.GetState(PlayerIndex.Two).DPad.Up) ||
+                else if (down && !(GamePad.GetState(PlayerIndex.One).ThumbSticks.Left.Y < -.1))
+                {
+                    down = false;
+                }
+
+                if ((ButtonState.Pressed == GamePad.GetState(PlayerIndex.Two).DPad.Up) ||
                 (GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.Y > .1))
                 {
                     upP2 = true;
                 }
-                while ((ButtonState.Pressed == GamePad.GetState(PlayerIndex.Two).DPad.Down) ||
+                if ((ButtonState.Pressed == GamePad.GetState(PlayerIndex.Two).DPad.Down) ||
                     (GamePad.GetState(PlayerIndex.Two).ThumbSticks.Left.Y < -.1))
                 {
                     downP2 = true;
@@ -604,7 +624,7 @@ namespace HeightmapCollision
             {
                 handPosP1 = input.getHandPosition(PlayerIndex.One, graphics.GraphicsDevice.Viewport);
                 GameState buttonState;
-                buttonState = mainMenuButton.Update(gameTime, input.getMouse(), handPosP1, betweenNum, PlayerIndex.One);
+                buttonState = mainMenuButton.Update(gameTime, input.getMouse(), handPosP1, betweenNum, PlayerIndex.One, mouseFocus);
                 if (buttonState != GameState.NOCHANGE)
                 {
                     p1TotalTime = TimeSpan.Zero;
@@ -615,7 +635,7 @@ namespace HeightmapCollision
                     return;
                 }
 
-                buttonState = readyButton.Update(gameTime, input.getMouse(), handPosP1, betweenNum, PlayerIndex.One);
+                buttonState = readyButton.Update(gameTime, input.getMouse(), handPosP1, betweenNum, PlayerIndex.One, mouseFocus);
 
                 if (buttonState != GameState.NOCHANGE)
                 {
@@ -629,7 +649,7 @@ namespace HeightmapCollision
                 GameState buttonState;
                 handPosP1 = input.getHandPosition(PlayerIndex.One, rightViewport);
                 handPosP2 = input.getHandPosition(PlayerIndex.Two, leftViewport);
-                buttonState = mainMenuButtonP1.Update(gameTime, input.getMouse(), handPosP1, betweenNum, PlayerIndex.One);
+                buttonState = mainMenuButtonP1.Update(gameTime, input.getMouse(), handPosP1, betweenNum, PlayerIndex.One, mouseFocus);
                 if (buttonState != GameState.NOCHANGE)
                 {
                     p1TotalTime = TimeSpan.Zero;
@@ -640,14 +660,14 @@ namespace HeightmapCollision
                     return;
                 }
 
-                buttonState = readyButtonP1.Update(gameTime, input.getMouse(), handPosP1, betweenNum, PlayerIndex.One);
+                buttonState = readyButtonP1.Update(gameTime, input.getMouse(), handPosP1, betweenNum, PlayerIndex.One, mouseFocus);
 
                 if (buttonState != GameState.NOCHANGE)
                 {
                     p1IsReady = true;
                 }
 
-                buttonState = mainMenuButtonP2.Update(gameTime, input.getMouse(), handPosP2, betweenNumP2, PlayerIndex.Two);
+                buttonState = mainMenuButtonP2.Update(gameTime, input.getMouse(), handPosP2, betweenNumP2, PlayerIndex.Two, mouseFocus);
                 if (buttonState != GameState.NOCHANGE)
                 {
                     p1TotalTime = TimeSpan.Zero;
@@ -658,7 +678,7 @@ namespace HeightmapCollision
                     return;
                 }
 
-                buttonState = readyButtonP2.Update(gameTime, input.getMouse(), handPosP2, betweenNumP2, PlayerIndex.Two);
+                buttonState = readyButtonP2.Update(gameTime, input.getMouse(), handPosP2, betweenNumP2, PlayerIndex.Two, mouseFocus);
 
                 if (buttonState != GameState.NOCHANGE)
                 {
@@ -682,7 +702,7 @@ namespace HeightmapCollision
             handPosP1 = input.getHandPosition(PlayerIndex.One, graphics.GraphicsDevice.Viewport);
             cursorPos = new Vector2(input.getMouse().X, input.getMouse().Y);
             int finishNum = 0; //brian fix this for xbox selection
-            buttonState = mainMenuButtonFinish.Update(gameTime, input.getMouse(), handPosP1, finishNum, PlayerIndex.One);
+            buttonState = mainMenuButtonFinish.Update(gameTime, input.getMouse(), handPosP1, finishNum, PlayerIndex.One, mouseFocus);
             if (buttonState != GameState.NOCHANGE)
             {
                 currentState = buttonState;
@@ -694,7 +714,7 @@ namespace HeightmapCollision
             GameState buttonState;
             handPosP1 = input.getHandPosition(PlayerIndex.One, graphics.GraphicsDevice.Viewport);
 
-            buttonState = onePlayerButton.Update(gameTime, input.getMouse(), handPosP1, levelNum, PlayerIndex.One);
+            buttonState = onePlayerButton.Update(gameTime, input.getMouse(), handPosP1, levelNum, PlayerIndex.One, mouseFocus);
 
             if (buttonState != GameState.NOCHANGE)
             {
@@ -707,7 +727,7 @@ namespace HeightmapCollision
                 return;
             }
 
-            buttonState = twoPlayerButton.Update(gameTime, input.getMouse(), handPosP1, levelNum, PlayerIndex.Two);
+            buttonState = twoPlayerButton.Update(gameTime, input.getMouse(), handPosP1, levelNum, PlayerIndex.Two, mouseFocus);
 
             if (buttonState != GameState.NOCHANGE)
             {
@@ -721,7 +741,7 @@ namespace HeightmapCollision
             }
 
 
-            buttonState = cancelButton.Update(gameTime, input.getMouse(), handPosP1, levelNum, PlayerIndex.One);
+            buttonState = cancelButton.Update(gameTime, input.getMouse(), handPosP1, levelNum, PlayerIndex.One, mouseFocus);
 
             if (buttonState != GameState.NOCHANGE)
             {
@@ -738,7 +758,7 @@ namespace HeightmapCollision
 
             handPosP1 = input.getHandPosition(PlayerIndex.One, graphics.GraphicsDevice.Viewport);
 
-            buttonState = startButton.Update(gameTime, input.getMouse(), handPosP1, mainNum, PlayerIndex.One);
+            buttonState = startButton.Update(gameTime, input.getMouse(), handPosP1, mainNum, PlayerIndex.One, mouseFocus);
 
             if (buttonState != GameState.NOCHANGE)
             {
@@ -746,7 +766,7 @@ namespace HeightmapCollision
                 return;
             }
 
-            buttonState = exitButton.Update(gameTime, input.getMouse(), handPosP1, mainNum, PlayerIndex.One);
+            buttonState = exitButton.Update(gameTime, input.getMouse(), handPosP1, mainNum, PlayerIndex.One, mouseFocus);
 
             if (buttonState != GameState.NOCHANGE)
             {
@@ -754,7 +774,7 @@ namespace HeightmapCollision
                 return;
             }
 
-            buttonState = helpButton.Update(gameTime, input.getMouse(), handPosP1, mainNum, PlayerIndex.One);
+            buttonState = helpButton.Update(gameTime, input.getMouse(), handPosP1, mainNum, PlayerIndex.One, mouseFocus);
 #if !XBOX360
             if (buttonState != GameState.NOCHANGE)
             {
